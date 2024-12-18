@@ -16,11 +16,12 @@ public class BlueEnemy extends Enemy {
     }
 
     private void wander() {
-        if ((posX >= maxX || posX < 0) || (posY >= maxY || posY < 0)) {
-          if (posX >= maxX || posX < 0) deltaX = -deltaX;
-          else deltaY = -deltaY;
-          deltaR =  rng.nextDouble(2) - 1;
-        }
+      // Check if enemy is outside borders of screen
+      if ((posX >= maxX || posX < 0) || (posY >= maxY || posY < 0)) {
+        if (posX >= maxX || posX < 0) deltaX = -deltaX; // Invert x if position if needed
+        else deltaY = -deltaY; // Invert y position if needed
+        deltaR = rng.nextDouble(2) - 1; // deltaR is the value that allows the enemy sprite to rotate
+      }
     }
 
     @Override

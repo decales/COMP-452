@@ -13,12 +13,14 @@ public abstract class Enemy extends Entity {
     }
     
     protected void spawn(double width, double height) {
-        do posX = rng.nextDouble(width); while (posX > width / 3 && posX < 2 * width / 3);
-        do posY = rng.nextDouble(height); while (posY > height / 3 && posY < 2 * height / 3);
-        updateSprite();
+      // Keep placing an enemy until its position is in the outer zone of the screen
+      do posX = rng.nextDouble(width); while (posX > width / 3 && posX < 2 * width / 3);
+      do posY = rng.nextDouble(height); while (posY > height / 3 && posY < 2 * height / 3);
+      updateSprite();
     }
 
     protected void rotate() {
+      // For rotation animation
       angle += deltaR;
       setRotate(angle % 360);
     }
@@ -30,11 +32,13 @@ public abstract class Enemy extends Entity {
     }
 
     protected double distance(double x, double y) {
-        return Math.sqrt(Math.pow(x - posX, 2) + Math.pow(y - posY, 2));
+      // Determine the distance to another entity
+      return Math.sqrt(Math.pow(x - posX, 2) + Math.pow(y - posY, 2));
     }
 
     @Override
     public boolean contains(double x, double y) {
-        return distance(x, y) <= size;
+      // Determine if another entity is within the current
+      return distance(x, y) <= size;
     }
 }

@@ -23,24 +23,28 @@ public class Model implements PublishSubscribe {
     private long lastTimeHit;
 
     public Model(double width, double height, int numRedEnemies, int numBlueEnemies, int playerHP, int timeLimit) {
-        this.width = width;
-        this.height = height;
-        
-        this.numRedEnemies = numRedEnemies;
-        this.numBlueEnemies = numBlueEnemies;
-        enemies = new ArrayList<>();
-        player = new Player(width, height, playerHP);
-        subscribers = new ArrayList<>();
-        subscribers.add(player);
-        
-        this.timeLimit = timeLimit;
-        timeRemaining = timeLimit + 1;
-        state = gameState.notStarted;
+
+      // Save screen width and height for scaling purposes
+      this.width = width;
+      this.height = height;
+      
+      // Enemy data
+      this.numRedEnemies = numRedEnemies;
+      this.numBlueEnemies = numBlueEnemies;
+      enemies = new ArrayList<>();
+      player = new Player(width, height, playerHP);
+      subscribers = new ArrayList<>();
+      subscribers.add(player);
+      
+      this.timeLimit = timeLimit;
+      timeRemaining = timeLimit + 1;
+      state = gameState.notStarted;
     }
 
     public void start() {
         state = gameState.inProgress;
         initEnemies(numRedEnemies, numBlueEnemies);
+        // Game loop
         timer = new AnimationTimer() {
             public void handle(long time) {
                 updateTime(time);
@@ -92,17 +96,18 @@ public class Model implements PublishSubscribe {
     }
 
     public void checkReset() {
-        if (player.health <= 0 || timeRemaining <= 0) {
-            if (player.health <= 0) state = gameState.doneLoss;
-            else state = gameState.doneWin;
-            player.health = 3;
-            timeRemaining = timeLimit + 1;
-            lastTimeHit = 0;
-            lastTimeUpdate = 0;
-            subscribers.removeAll(enemies);
-            enemies.clear();
-            timer.stop();
-        }
+      // Check if end conditions are met, and if so, reset game values
+      if (player.health <= 0 || timeRemaining <= 0) {
+          if (player.health <= 0) state = gameState.doneLoss;
+          else state = gameState.doneWin;
+          player.health = 3;
+          timeRemaining = timeLimit + 1;
+          lastTimeHit = 0;
+          lastTimeUpdate = 0;
+          subscribers.removeAll(enemies);
+          enemies.clear();
+          timer.stop();
+      }
     }
 
     public void update(double playerX, double playerY) {

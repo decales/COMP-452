@@ -25,8 +25,9 @@ public class Entity extends ImageView implements PublishSubscribe {
     }
 
     protected void updateSprite() {
-        setLayoutX(posX);
-        setLayoutY(posY);
+      // Helper function to update the placement of the sprite on-screen when its posX or posY change
+      setLayoutX(posX);
+      setLayoutY(posY);
     }
 
     @Override

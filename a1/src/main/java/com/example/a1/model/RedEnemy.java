@@ -21,54 +21,58 @@ public class RedEnemy extends Enemy {
     }
 
     private void avoid(List<Enemy> enemies) {
-        for (Enemy enemy : enemies) {
-            if (enemy == this) continue; 
+      for (Enemy enemy : enemies) { // Calculate using positions of all enemies on screen
+        if (enemy == this) continue; // skip self 
 
-            double distanceToEnemyX = this.posX - enemy.posX;
-            double distanceToEnemyY = this.posY - enemy.posY;
-            double distanceToEnemy = Math.sqrt(Math.pow(distanceToEnemyX, 2) + Math.pow(distanceToEnemyY, 2));
+        double distanceToEnemyX = this.posX - enemy.posX;
+        double distanceToEnemyY = this.posY - enemy.posY;
+        double distanceToEnemy = Math.sqrt(Math.pow(distanceToEnemyX, 2) + Math.pow(distanceToEnemyY, 2));
 
-            double separationMod = 1.5;
-            double repelMod = 1.2;
-            if (distanceToEnemy < size * separationMod) {
-                double repellingForceX = (distanceToEnemyX / distanceToEnemy) * repelMod;
-                double repellingForceY = (distanceToEnemyY / distanceToEnemy) * repelMod;
-                deltaX += repellingForceX;
-                deltaY += repellingForceY;
-            }
+        double separationMod = 1.5; // Value to determine the boundary at which the repel should begin
+        double repelMod = 1.2; // Value to adjust the strength of the repel force
+
+        if (distanceToEnemy < size * separationMod) { // Repel if an enemy is at or within repel boundary
+            double repellingForceX = (distanceToEnemyX / distanceToEnemy) * repelMod;
+            double repellingForceY = (distanceToEnemyY / distanceToEnemy) * repelMod;
+            deltaX += repellingForceX;
+            deltaY += repellingForceY;
         }
+      }
     }
 
     private void face() {
+      // Faces the enemy sprite in the direction of the player
       angle = Math.toDegrees(Math.atan2(deltaY, deltaX)) + 90;
       setRotate(angle);
     }
 
     private void normalMode(List<Enemy> enemies, double playerX, double playerY) {
-        velocity = normalVelocity;
-        seek(playerX, playerY); 
-        avoid(enemies);
-        rotate();
+      // Enemy moves at normal speed and paths around other enemies
+      velocity = normalVelocity;
+      seek(playerX, playerY); 
+      avoid(enemies);
+      rotate();
     }
 
     private void aggroMode(List<Enemy> enemies, double playerX, double playerY) {
-        velocity = aggroVelocity;
-        seek(playerX, playerY);
-        face();
+      // Enemy speeds up and ignore collision with other enemies
+      velocity = aggroVelocity;
+      seek(playerX, playerY);
+      face();
     }
 
     @Override
     public void update(
-        double playerX,
-        double playerY,
-        int playerHP,
-        boolean playerInvulnerable,
-        long timeRemaining,
-        Model.gameState state,
-        List<Enemy> enemies)
-    { 
-      if (timeRemaining > 5) normalMode(enemies, playerX, playerY);
-      else aggroMode(enemies, playerX, playerY);
-      move();
-    }
+      double playerX,
+      double playerY,
+      int playerHP,
+      boolean playerInvulnerable,
+      long timeRemaining,
+      Model.gameState state,
+      List<Enemy> enemies)
+  { 
+    if (timeRemaining > 5) normalMode(enemies, playerX, playerY);
+    else aggroMode(enemies, playerX, playerY);
+    move();
+  }
 }

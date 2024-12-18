@@ -31,14 +31,15 @@ public class Player extends Entity {
     }
 
     private void setSprite() {
-        if (isInvulnerable && hasDefaultSprite) {
-            setImage(new Image("playerDamaged.png"));
-            hasDefaultSprite = false;
-        }
-        else if (!isInvulnerable) {
-            setImage(new Image("player.png"));
-            hasDefaultSprite = true;
-        }
+      // Update player sprite depending on whether player is in default or damaged state
+      if (isInvulnerable && hasDefaultSprite) {
+          setImage(new Image("playerDamaged.png"));
+          hasDefaultSprite = false;
+      }
+      else if (!isInvulnerable) {
+          setImage(new Image("player.png"));
+          hasDefaultSprite = true;
+      }
     }
 
     @Override
