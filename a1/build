@@ -1,0 +1,4 @@
+#!/bin/bash
+./mvnw clean compile package clean
+mv shade/ out/
+

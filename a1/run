@@ -1,5 +1,2 @@
 #!/bin/bash
-
-MAIN_CLASS="com.example.a1.App"
-./mvnw clean compile exec:java -Dexec.mainClass="$MAIN_CLASS"
-
+./mvnw clean compile javafx:run clean
