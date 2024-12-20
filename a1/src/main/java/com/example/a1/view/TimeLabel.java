@@ -8,7 +8,9 @@ import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class TimeLabel extends Label implements PublishSubscribe {
 
@@ -31,7 +33,7 @@ public class TimeLabel extends Label implements PublishSubscribe {
     @Override
     public void update(double playerX, double playerY, int playerHP, boolean playerInvulnerable, long timeRemaining, Model.gameState state, List<Enemy> enemies) {
         if (state == Model.gameState.inProgress) {
-            setText(String.valueOf(timeRemaining));
+            setText(String.valueOf(TimeUnit.MILLISECONDS.toSeconds(timeRemaining) + 1));
             setVisible(true);
         }
         else setVisible(false);

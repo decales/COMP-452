@@ -8,7 +8,7 @@ public class BlueEnemy extends Enemy {
 
     public BlueEnemy(double width, double height) {
       super("blueEnemy.png", width, height);
-        velocity = rng.nextDouble(0.5) + 0.5 * Math.max(width, height) * 0.00125;
+        velocity = rng.nextDouble(0.5) + 0.5 * Math.max(width, height) * 0.0025;
         deltaX = ((rng.nextBoolean()) ? 1 : -1) * velocity;
         deltaY = ((rng.nextBoolean()) ? 1 : -1) * velocity;
         maxX = width;

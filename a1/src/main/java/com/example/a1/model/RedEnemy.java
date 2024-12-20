@@ -9,7 +9,7 @@ public class RedEnemy extends Enemy {
 
     public RedEnemy(double width, double height) {
       super("redEnemy.png", width, height);
-      normalVelocity = Math.max(width, height) * 0.00125 ;
+      normalVelocity = Math.max(width, height) * 0.00333;
       aggroVelocity = normalVelocity * 1.25;
       deltaR = 1.5;
     }
@@ -71,7 +71,7 @@ public class RedEnemy extends Enemy {
       Model.gameState state,
       List<Enemy> enemies)
   { 
-    if (timeRemaining > 5) normalMode(enemies, playerX, playerY);
+    if (timeRemaining > 5000) normalMode(enemies, playerX, playerY);
     else aggroMode(enemies, playerX, playerY);
     move();
   }

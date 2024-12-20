@@ -1,6 +1,10 @@
 package com.example.a1.model;
 
-import javafx.animation.AnimationTimer;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.util.Duration;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,19 +12,17 @@ public class Model implements PublishSubscribe {
 
     public enum gameState { notStarted, inProgress, doneWin, doneLoss }
 
-    public double width;
-    public double height;
+    public double width, height;
     public Player player;
-    private int numRedEnemies;
-    private int numBlueEnemies;
+    private int numRedEnemies, numBlueEnemies;
     public List<Enemy> enemies;
     protected List<PublishSubscribe> subscribers;
     private gameState state;
-    private AnimationTimer timer;
+    private Timeline gameTimer;
+    private Timeline countdownTimer;
     private int timeLimit;
     private int timeRemaining;
-    private long lastTimeUpdate;
-    private long lastTimeHit;
+    private long timeHit;
 
     public Model(double width, double height, int numRedEnemies, int numBlueEnemies, int playerHP, int timeLimit) {
 
@@ -36,77 +38,71 @@ public class Model implements PublishSubscribe {
       subscribers = new ArrayList<>();
       subscribers.add(player);
       
-      this.timeLimit = timeLimit;
-      timeRemaining = timeLimit + 1;
+      this.timeLimit = timeLimit * 1000;
+      timeRemaining = this.timeLimit;
       state = gameState.notStarted;
+
+      // Main game animation and event timer
+      gameTimer = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
+        detectPlayerCollision();
+        checkReset();
+        update(player.posX, player.posY, player.health, player.isInvulnerable, timeRemaining, state, enemies);
+      }));
+      gameTimer.setCycleCount(Animation.INDEFINITE);
+      gameTimer.setRate(60);
+
+      // Countdown timer (millis)
+      countdownTimer = new Timeline(new KeyFrame(Duration.seconds(1), event -> timeRemaining--));
+      countdownTimer.setCycleCount(timeRemaining);
+      countdownTimer.setRate(1000);
     }
 
     public void start() {
-        state = gameState.inProgress;
-        initEnemies(numRedEnemies, numBlueEnemies);
-        // Game loop
-        timer = new AnimationTimer() {
-            public void handle(long time) {
-                updateTime(time);
-                detectPlayerCollision(time);
-                checkReset();
-                update(player.posX, player.posY, player.health, player.isInvulnerable, timeRemaining, state, enemies);
-            }
-        };
-        timer.start();
-    }
-
-    private void updateTime(long time) {
-        if (time - lastTimeUpdate >= 1000000000) {
-            timeRemaining--;
-            lastTimeUpdate = time;
-        }
+      state = gameState.inProgress;
+      initEnemies(numRedEnemies, numBlueEnemies);
+      gameTimer.play();
+      countdownTimer.play();
     }
 
     private void initEnemies(int numRed, int numBlue) {
-        for (int i = 0; i < numRed; i++) {
-            RedEnemy enemy = new RedEnemy(width, height);
-            enemies.add(enemy);
-        }
-        for (int i = 0; i < numBlue; i++) {
-            BlueEnemy enemy = new BlueEnemy(width, height);
-            enemies.add(enemy);
-        }
-        subscribers.addAll(enemies);
+      for (int i = 0; i < numRed; i++) enemies.add(new RedEnemy(width, height));
+      for (int i = 0; i < numBlue; i++) enemies.add(new BlueEnemy(width, height));
+      subscribers.addAll(enemies);
     }
 
-    private void detectPlayerCollision(long time) {
-        if (!player.isInvulnerable) {
-            for (Enemy enemy : enemies) {
-                if (enemy.contains(player.posX, player.posY)) {
-                    player.health--;
-                    player.isInvulnerable = true;
-                    lastTimeHit = time;
-                    break;
-                }
-            }
+    private void detectPlayerCollision() {
+      if (!player.isInvulnerable) {
+        for (Enemy enemy : enemies) {
+          if (enemy.contains(player.posX, player.posY)) { // player is hit
+            player.health--;
+            player.isInvulnerable = true;
+            timeHit = timeRemaining;
+            break;
+          }
         }
-        else if (time - lastTimeHit >= 1000000000) { // 1s invulnerability time after hit
-            player.isInvulnerable = false;
-        }
+      }
+      else if (timeHit - timeRemaining >= 1000) { // 1s invulnerability time after hit
+        player.isInvulnerable = false;
+      }
     }
 
     public void addSubscribers(PublishSubscribe... subscribers) {
-        this.subscribers.addAll(List.of(subscribers));
+      this.subscribers.addAll(List.of(subscribers));
     }
 
     public void checkReset() {
       // Check if end conditions are met, and if so, reset game values
       if (player.health <= 0 || timeRemaining <= 0) {
-          if (player.health <= 0) state = gameState.doneLoss;
-          else state = gameState.doneWin;
-          player.health = 3;
-          timeRemaining = timeLimit + 1;
-          lastTimeHit = 0;
-          lastTimeUpdate = 0;
-          subscribers.removeAll(enemies);
-          enemies.clear();
-          timer.stop();
+        if (player.health <= 0) state = gameState.doneLoss;
+        else state = gameState.doneWin;
+        player.health = 3;
+        player.isInvulnerable = false;
+        timeRemaining = timeLimit;
+        timeHit = 0;
+        subscribers.removeAll(enemies);
+        enemies.clear();
+        gameTimer.stop();
+        countdownTimer.stop();
       }
     }
 
