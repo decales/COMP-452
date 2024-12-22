@@ -1,11 +1,12 @@
-package com.example.a2_1.model; 
+package com.example.a2_1.model;
+
+import com.example.a2_1.view.TileSelector.TileSelectorType;
 
 public interface PublishSubscribe {
 
   void update(
-      double rootHeight,
+      double gridHeight,
       int[][] terrainGrid,
-      int[][] entityGrid
-      );
-
+      int[][] entityGrid,
+      TileSelectorType currentSelectorType);
 }

@@ -1,48 +1,55 @@
 package com.example.a2_1.view;
 
+import com.example.a2_1.Controller;
 import com.example.a2_1.model.PublishSubscribe;
 import com.example.a2_1.view.GridTile.TileType;
+import com.example.a2_1.view.TileSelector.TileSelectorType;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
 
 public class GridView extends GridPane implements PublishSubscribe {
 
   private double tileSpacing;
+  private Controller controller;
 
-  public GridView(double tileSpacing) {
+  public GridView(Controller controller, double tileSpacing) {
+    this.controller = controller;
     this.tileSpacing = tileSpacing;
     setHgap(this.tileSpacing);
     setVgap(this.tileSpacing);
-    setStyle("-fx-background-color: darkgrey; -fx-border-color: darkgrey; -fx-border-width:" + tileSpacing);
   }
 
   @Override
-  public void update(double gridHeight, int[][] terrainGrid, int[][] entityGrid) {
+  public void update(
+      double gridHeight,
+      int[][] terrainGrid,
+      int[][] entityGrid,
+      TileSelectorType currentSelectorType) {
+
+    getChildren().clear();
 
     int tileCount = terrainGrid.length;
     for (int i = 0; i < tileCount; i++) {
       for (int j = 0; j < tileCount; j++) {
 
-        StackPane tile = new StackPane();
-        TileType tileType = null;
-        double tileSize = gridHeight / tileCount - tileSpacing;
-
         // Determine tile terrain type
+        TileType terrainType = null;
         switch(terrainGrid[i][j]) {
-          case 1 -> tileType = TileType.Terrain;
-          case 3 -> tileType = TileType.Grassland;
-          case 4 -> tileType = TileType.Swamp;
-        }
-        tile.getChildren().add(new GridTile(tileType, tileSize));
+          case 1 -> terrainType = TileType.Terrain;
+          case 3 -> terrainType = TileType.Grassland;
+          case 4 -> terrainType = TileType.Swamp;
+        } 
 
         // Determine if tile contains an entity
+        TileType entityType = null;
         switch(entityGrid[i][j]) {
-          case 1 -> tileType = TileType.Character;
-          case 2 -> tileType = TileType.Goal;
-          case 3 -> tileType = TileType.Obstacle;
+          case 0 -> entityType = TileType.None;
+          case 1 -> entityType = TileType.Character;
+          case 2 -> entityType = TileType.Goal;
+          case 3 -> entityType = TileType.Obstacle;
         }
-        tile.getChildren().add(new GridTile(tileType, tileSize));
-
+        
+        GridTile tile = new GridTile(i, j, terrainType, entityType, gridHeight / tileCount - tileSpacing);
+        tile.setOnMouseClicked(controller::handleMouseClicked); 
         add(tile, i, j);
       }
     }

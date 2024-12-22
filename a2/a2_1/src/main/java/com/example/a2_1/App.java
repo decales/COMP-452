@@ -36,7 +36,7 @@ public class App extends Application {
         root.spacingProperty().set(rootPadding);
 
         // Grid
-        GridView gridView = new GridView(tileSpacing);
+        GridView gridView = new GridView(controller, tileSpacing);
         
         // Side menu
         AnchorPane sideMenu = new AnchorPane();

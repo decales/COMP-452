@@ -8,29 +8,28 @@ public class TileSelector extends StackPane {
 
   public enum TileSelectorType { Terrain, Grassland, Swamp, Character, Obstacle, Goal };
 
-  protected TileSelectorType selectorType;
-  private boolean isSelected;
+  public TileSelectorType selectorType;
 
-  public TileSelector(TileSelectorType selectorType, double spriteSize) {
+  public TileSelector(TileSelectorType selectorType, boolean isSelected, double spriteSize) {
     
     this.selectorType = selectorType;
 
-    String spriteImage = "";
+    String spriteSource = "";
     switch(this.selectorType) {
-      case Terrain -> spriteImage = "terrain.png";
-      case Grassland -> spriteImage = "grassland.png";
-      case Swamp -> spriteImage = "swamp.png";
-      case Character -> spriteImage = "black-ant.png";
-      case Obstacle -> spriteImage = "red-ant.png";
-      case Goal -> spriteImage = "blueberry.png";
+      case Terrain -> spriteSource = "terrain.png";
+      case Grassland -> spriteSource = "grassland.png";
+      case Swamp -> spriteSource = "swamp.png";
+      case Character -> spriteSource = "black-ant.png";
+      case Obstacle -> spriteSource = "red-ant.png";
+      case Goal -> spriteSource = "blueberry.png";
     }
 
-    ImageView sprite = new ImageView(new Image(spriteImage));
-    sprite.setFitWidth(spriteSize);
-    sprite.setFitHeight(spriteSize);
-    sprite.preserveRatioProperty().set(true);
+    ImageView sprite = new ImageView(new Image(spriteSource));
+    double borderWidth = spriteSize * 0.075;
+    sprite.setFitWidth(spriteSize - borderWidth);
+    sprite.setFitHeight(spriteSize - borderWidth);
     getChildren().add(sprite);
     
-    setStyle(String.format("-fx-border-color: %s; -fx-border-width: %f", (isSelected) ? "lime" : "darkgrey", spriteSize * 0.075));
+    setStyle(String.format("-fx-border-color: %s; -fx-border-width: %f", (isSelected) ? "magenta" : "darkgrey", borderWidth));
   }
 }

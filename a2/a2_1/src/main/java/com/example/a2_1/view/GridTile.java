@@ -1,35 +1,43 @@
 package com.example.a2_1.view;
 
+import java.util.List;
+
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
 
-
-public class GridTile extends ImageView {
+public class GridTile extends StackPane {
   
-  public enum TileType { Terrain, Grassland, Swamp, Character, Obstacle, Goal };
+  public enum TileType { Terrain, Grassland, Swamp, Character, Obstacle, Goal, None};
 
-  protected boolean isVisited;
+  public boolean isVisited;
+  public int i, j;
 
-  public GridTile(TileType tileType, double spriteSize) {
+  public GridTile(int i, int j, TileType terrainType, TileType entityType, double spriteSize) {
 
-    String spriteImage = "";
-    switch(tileType) {
-      case Terrain -> spriteImage = "terrain.png";
-      case Grassland -> spriteImage = "grassland.png";
-      case Swamp -> spriteImage = "swamp.png";
-      case Character -> spriteImage = "black-ant.png";
-      case Obstacle -> spriteImage = "red-ant.png";
-      case Goal -> spriteImage = "blueberry.png";
+    this.i = i;
+    this.j = j;
+
+    double borderWidth = spriteSize * 0.075;
+    
+    for (TileType tileType : List.of(terrainType, entityType)) {
+      String spriteSource = "";
+      switch(tileType) {
+        case None -> { continue;}
+        case Terrain -> spriteSource = "terrain.png";
+        case Grassland -> spriteSource = "grassland.png";
+        case Swamp -> spriteSource = "swamp.png";
+        case Character -> spriteSource = "black-ant.png";
+        case Obstacle -> spriteSource = "red-ant.png";
+        case Goal -> spriteSource = "blueberry.png";
+      }
+      ImageView sprite = new ImageView(new Image(spriteSource));
+      sprite.setFitWidth(spriteSize - borderWidth);
+      sprite.setFitHeight(spriteSize - borderWidth);
+      getChildren().add(sprite);
     }
-    setImage(new Image(spriteImage));
 
-    isVisited = true;
-
-    if (isVisited) setStyle("-fx-border-color: lime; -fx-border-width: 50;");
-    else setStyle("-fx-border-color: darkgrey; -fx-border-width: 50;");
-
-    setFitWidth(spriteSize);
-    setFitHeight(spriteSize);
+    setStyle(String.format("-fx-border-color: %s; -fx-border-width: %f", (isVisited) ? "lime" : "darkgrey",  borderWidth));
   }
 } 
 

@@ -4,6 +4,7 @@ import javax.swing.GroupLayout.Alignment;
 
 import com.example.a2_1.Controller;
 import com.example.a2_1.model.PublishSubscribe;
+import com.example.a2_1.view.TileSelector.TileSelectorType;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -21,7 +22,13 @@ public class ControlMenu extends VBox implements PublishSubscribe {
   }
 
   @Override
-  public void update(double gridHeight, int[][] terrainGrid, int[][] entityGrid) {
+  public void update(
+      double gridHeight,
+      int[][] terrainGrid,
+      int[][] entityGrid,
+      TileSelectorType currentTileType) {
+
+    getChildren().clear();
 
     setPrefHeight(gridHeight * 0.2);
     setSpacing(getPrefHeight() * 0.1);
