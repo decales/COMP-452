@@ -1,14 +1,14 @@
 package com.example.a2_1;
 
-import javax.swing.GroupLayout.Alignment;
-
 import com.example.a2_1.model.Model;
-import com.example.a2_1.view.GridBuilderMenu;
+import com.example.a2_1.view.ControlMenu;
 import com.example.a2_1.view.GridView;
+import com.example.a2_1.view.TileMenu;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -27,21 +27,30 @@ public class App extends Application {
         double tileSpacing = (gridSpacingRatio * displayHeight * displayRatio) / 16;
         double gridHeight = (displayHeight * displayRatio) - rootPadding * 2;
 
-        // Initialize model
         Model model = new Model(gridHeight);
+        Controller controller = new Controller(model);
         
         // Initialize UI components
         HBox root = new HBox();
         root.paddingProperty().set(new Insets(rootPadding));
+        root.spacingProperty().set(rootPadding);
 
+        // Grid
         GridView gridView = new GridView(tileSpacing);
-        GridBuilderMenu gridMenu = new GridBuilderMenu();
+        
+        // Side menu
+        AnchorPane sideMenu = new AnchorPane();
+        TileMenu gridMenu = new TileMenu(controller);
+        ControlMenu controlMenu = new ControlMenu(controller);
+        sideMenu.setTopAnchor(gridMenu, 0.0);
+        sideMenu.setBottomAnchor(controlMenu, 0.0);
+        sideMenu.getChildren().addAll(gridMenu, controlMenu);
 
-        root.getChildren().addAll(gridView, gridMenu);
-        model.addSubscribers(gridView, gridMenu);
+        root.getChildren().addAll(gridView, sideMenu);
+        model.addSubscribers(gridView, gridMenu, controlMenu);
 
         Scene scene = new Scene(root);
-        stage.setTitle("");
+        stage.setTitle("(A*)nt Simulator");
         stage.setScene(scene);
         stage.setResizable(false);
         stage.show();

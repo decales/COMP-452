@@ -1,0 +1,40 @@
+package com.example.a2_1.view;
+
+import com.example.a2_1.Controller;
+import com.example.a2_1.model.PublishSubscribe;
+import com.example.a2_1.view.TileSelector.TileSelectorType;
+
+import javafx.geometry.Pos;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
+
+public class TileMenu extends VBox implements PublishSubscribe {
+
+  private Controller controller;
+
+  public TileMenu(Controller controller) {
+    
+    this.controller = controller;
+    setAlignment(Pos.CENTER);
+    // setStyle("-fx-background-color: blue;");
+  }
+
+  @Override
+  public void update(double gridHeight, int[][] terrainGrid, int[][] entityGrid) {
+    if (getChildren().isEmpty()) {
+
+      setPrefHeight(gridHeight * 0.5);
+      setSpacing(getPrefHeight() * 0.05);
+    
+      // Initialize tile selector buttons
+      for (TileSelectorType type : TileSelectorType.values()) {
+        TileSelector selector = new TileSelector(type, gridHeight * 0.0667);
+        setVgrow(selector, Priority.ALWAYS);
+        getChildren().add(selector);
+      } 
+    }
+    else {
+
+    }
+  }
+}

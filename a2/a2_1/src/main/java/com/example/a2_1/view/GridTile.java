@@ -8,6 +8,8 @@ public class GridTile extends ImageView {
   
   public enum TileType { Terrain, Grassland, Swamp, Character, Obstacle, Goal };
 
+  protected boolean isVisited;
+
   public GridTile(TileType tileType, double spriteSize) {
 
     String spriteImage = "";
@@ -20,6 +22,12 @@ public class GridTile extends ImageView {
       case Goal -> spriteImage = "blueberry.png";
     }
     setImage(new Image(spriteImage));
+
+    isVisited = true;
+
+    if (isVisited) setStyle("-fx-border-color: lime; -fx-border-width: 50;");
+    else setStyle("-fx-border-color: darkgrey; -fx-border-width: 50;");
+
     setFitWidth(spriteSize);
     setFitHeight(spriteSize);
   }
