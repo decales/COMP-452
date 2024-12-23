@@ -1,13 +1,9 @@
 package com.example.a2_1.view;
 
-import javax.swing.GroupLayout.Alignment;
-
 import com.example.a2_1.Controller;
 import com.example.a2_1.model.PublishSubscribe;
 import com.example.a2_1.view.TileSelector.TileSelectorType;
-
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
@@ -27,24 +23,24 @@ public class ControlMenu extends VBox implements PublishSubscribe {
       int[][] terrainGrid,
       int[][] entityGrid,
       int[][] visited,
-      TileSelectorType currentTileType) {
+      TileSelectorType currentTileType,
+      boolean animationStarted,
+      int pathLength) {
 
     getChildren().clear();
 
     setPrefHeight(gridHeight * 0.2);
     setSpacing(getPrefHeight() * 0.1);
 
-    Button startButton = new Button("Start");
-    startButton.setOnMouseClicked(controller::handleMouseClicked);
-
-    Button resetButton = new Button("Reset");
+    StartResetButton button = new StartResetButton(0, animationStarted);
+    button.setOnMouseClicked(controller::handleMouseClicked);
 
     VBox pathBox = new VBox();
     Label pathLabel = new Label("Length");
-    Label pathNumber = new Label("0");
+    Label pathNumber = new Label(Integer.toString(pathLength));
     pathBox.setAlignment(Pos.CENTER);
     pathBox.getChildren().addAll(pathLabel, pathNumber);
 
-    getChildren().addAll(startButton, resetButton, pathBox);
+    getChildren().addAll(button, pathBox);
   }
 }

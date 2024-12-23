@@ -23,7 +23,9 @@ public class TileMenu extends VBox implements PublishSubscribe {
       int[][] terrainGrid,
       int[][] entityGrid,
       int[][] visited,
-      TileSelectorType currentSelectorType) {
+      TileSelectorType currentSelectorType,
+      boolean animationStarted,
+      int pathLength) {
 
     getChildren().clear();
     
@@ -33,7 +35,7 @@ public class TileMenu extends VBox implements PublishSubscribe {
     // Draw tile selector buttons
     for (TileSelectorType type : TileSelectorType.values()) {
       TileSelector selector = new TileSelector(type, type.equals(currentSelectorType), gridHeight * 0.0667);
-      selector.setOnMouseClicked(controller::handleMouseClicked);
+      if (!animationStarted) selector.setOnMouseClicked(controller::handleMouseClicked); // Tiles only clickable when animation not started
       getChildren().add(selector);
     } 
   }

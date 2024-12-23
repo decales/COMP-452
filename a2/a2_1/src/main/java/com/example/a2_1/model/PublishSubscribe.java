@@ -9,5 +9,7 @@ public interface PublishSubscribe {
       int[][] terrainGrid,
       int[][] entityGrid,
       int[][] visited,
-      TileSelectorType currentSelectorType);
+      TileSelectorType currentSelectorType,
+      boolean animationStarted,
+      int pathLength);
 }

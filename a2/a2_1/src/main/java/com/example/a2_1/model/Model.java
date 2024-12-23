@@ -8,10 +8,11 @@ import java.util.PriorityQueue;
 import com.example.a2_1.view.TileSelector.TileSelectorType;
 
 public class Model {
-  
+
   private ArrayList<PublishSubscribe> subscribers;
   private double rootHeight;
   private TileSelectorType currentSelectorType;
+  private boolean animationStarted;
   
   private int[][] terrainGrid;
   private int[][] entityGrid;
@@ -72,29 +73,28 @@ public class Model {
     updateSubcribers();
   }
 
-  public void startSearch() {
-
-    // Save start position of character
+  public void start() {
+    // Save start position of character for reset
     character_i_init = character_i;
     character_j_init = character_j;
-
+    animationStarted = true;
     pathLength = AStarSearch();
-    System.out.println(pathLength);
     updateSubcribers();
-    reset();
   }
 
   public void reset() {
     character_i = character_i_init;
     character_j = character_j_init;
-    pathLength = 0;
     nextVisit.clear();
+    animationStarted = false;
+    pathLength = 0;
 
     for (int i = 0; i < terrainGrid.length; i++) {
       Arrays.fill(visited[i], 0);
       Arrays.fill(hCosts[i], 0);
       Arrays.fill(gCosts[i], Integer.MAX_VALUE);
     }
+    updateSubcribers();
   }
 
   private int AStarSearch() {
@@ -139,7 +139,7 @@ public class Model {
   }
 
   public void retracePath(AStarNode goalNode) {
-
+    // retrace from the goal node to determine the shortest path, using visisted array
     AStarNode currentNode = goalNode;
     while(currentNode != null) {
       visited[currentNode.i][currentNode.j] = 2;
@@ -188,6 +188,7 @@ public class Model {
   }
 
   private void updateSubcribers() {
-    subscribers.forEach(subcriber -> subcriber.update(rootHeight, terrainGrid, entityGrid, visited, currentSelectorType));
+    subscribers.forEach(subcriber -> subcriber.update(
+          rootHeight, terrainGrid, entityGrid, visited, currentSelectorType, animationStarted, pathLength));
   }
 }

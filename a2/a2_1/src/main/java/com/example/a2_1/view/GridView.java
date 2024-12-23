@@ -24,7 +24,9 @@ public class GridView extends GridPane implements PublishSubscribe {
       int[][] terrainGrid,
       int[][] entityGrid,
       int[][] visited,
-      TileSelectorType currentSelectorType) {
+      TileSelectorType currentSelectorType,
+      boolean animationStarted,
+      int pathLength) {
 
     getChildren().clear();
 
@@ -50,7 +52,7 @@ public class GridView extends GridPane implements PublishSubscribe {
         }
         
         GridTile tile = new GridTile(i, j, terrainType, entityType, visited[i][j], gridHeight / tileCount - tileSpacing);
-        tile.setOnMouseClicked(controller::handleMouseClicked); 
+        if (!animationStarted) tile.setOnMouseClicked(controller::handleMouseClicked); // Tiles only clickable when animation is not started
         add(tile, i, j);
       }
     }
