@@ -3,6 +3,8 @@ package com.example.a2_1;
 import com.example.a2_1.model.Model;
 import com.example.a2_1.view.GridTile;
 import com.example.a2_1.view.TileSelector;
+
+import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
 
 public class Controller {
@@ -19,7 +21,9 @@ public class Controller {
     switch(event.getSource()) {
       case TileSelector source -> model.updateSelectorType(source.selectorType);
       case GridTile source -> model.updateGrid(source.i, source.j);
+      case Button source -> model.startSearch();
       default -> { /* This should never happen*/ }
+
     }
   }
 }

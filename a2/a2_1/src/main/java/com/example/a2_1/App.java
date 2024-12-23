@@ -34,6 +34,7 @@ public class App extends Application {
         HBox root = new HBox();
         root.paddingProperty().set(new Insets(rootPadding));
         root.spacingProperty().set(rootPadding);
+        root.setStyle("-fx-background-color: lightgrey");
 
         // Grid
         GridView gridView = new GridView(controller, tileSpacing);

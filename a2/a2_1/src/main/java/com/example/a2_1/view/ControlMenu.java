@@ -34,6 +34,8 @@ public class ControlMenu extends VBox implements PublishSubscribe {
     setSpacing(getPrefHeight() * 0.1);
 
     Button startButton = new Button("Start");
+    startButton.setOnMouseClicked(controller::handleMouseClicked);
+
     Button resetButton = new Button("Reset");
 
     VBox pathBox = new VBox();

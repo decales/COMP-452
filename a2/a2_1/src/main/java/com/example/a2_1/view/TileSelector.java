@@ -6,7 +6,7 @@ import javafx.scene.layout.StackPane;
 
 public class TileSelector extends StackPane {
 
-  public enum TileSelectorType { Terrain, Grassland, Swamp, Character, Obstacle, Goal };
+  public enum TileSelectorType { Terrain, Grassland, Swamp, Obstacle, Character, Goal };
 
   public TileSelectorType selectorType;
 
@@ -19,8 +19,8 @@ public class TileSelector extends StackPane {
       case Terrain -> spriteSource = "terrain.png";
       case Grassland -> spriteSource = "grassland.png";
       case Swamp -> spriteSource = "swamp.png";
-      case Character -> spriteSource = "black-ant.png";
       case Obstacle -> spriteSource = "red-ant.png";
+      case Character -> spriteSource = "black-ant.png";
       case Goal -> spriteSource = "blueberry.png";
     }
 
@@ -30,6 +30,10 @@ public class TileSelector extends StackPane {
     sprite.setFitHeight(spriteSize - borderWidth);
     getChildren().add(sprite);
     
-    setStyle(String.format("-fx-border-color: %s; -fx-border-width: %f", (isSelected) ? "magenta" : "darkgrey", borderWidth));
+    setStyle(String.format(
+          "-fx-border-color: %s;" +
+          "-fx-border-width: %f;" +
+          "-fx-background-color: darkgrey",
+          (isSelected) ? "magenta" : "grey", borderWidth));
   }
 }

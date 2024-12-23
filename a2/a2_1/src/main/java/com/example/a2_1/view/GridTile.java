@@ -1,7 +1,6 @@
 package com.example.a2_1.view;
 
 import java.util.List;
-
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
@@ -19,6 +18,8 @@ public class GridTile extends StackPane {
     this.j = j;
 
     double borderWidth = spriteSize * 0.075;
+
+    double spriteOrientation = 0;
     
     for (TileType tileType : List.of(terrainType, entityType)) {
       String spriteSource = "";
@@ -28,10 +29,11 @@ public class GridTile extends StackPane {
         case Grassland -> spriteSource = "grassland.png";
         case Swamp -> spriteSource = "swamp.png";
         case Character -> spriteSource = "black-ant.png";
-        case Obstacle -> spriteSource = "red-ant.png";
         case Goal -> spriteSource = "blueberry.png";
+        case Obstacle -> spriteSource = "red-ant.png";
       }
       ImageView sprite = new ImageView(new Image(spriteSource));
+      sprite.setRotate(spriteOrientation);
       sprite.setFitWidth(spriteSize - borderWidth);
       sprite.setFitHeight(spriteSize - borderWidth);
       getChildren().add(sprite);
