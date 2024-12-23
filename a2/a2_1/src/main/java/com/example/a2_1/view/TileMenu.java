@@ -22,6 +22,7 @@ public class TileMenu extends VBox implements PublishSubscribe {
       double gridHeight,
       int[][] terrainGrid,
       int[][] entityGrid,
+      int[][] visited,
       TileSelectorType currentSelectorType) {
 
     getChildren().clear();

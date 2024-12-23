@@ -8,5 +8,6 @@ public interface PublishSubscribe {
       double gridHeight,
       int[][] terrainGrid,
       int[][] entityGrid,
+      int[][] visited,
       TileSelectorType currentSelectorType);
 }

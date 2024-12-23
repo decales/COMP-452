@@ -12,7 +12,7 @@ public class GridTile extends StackPane {
   public boolean isVisited;
   public int i, j;
 
-  public GridTile(int i, int j, TileType terrainType, TileType entityType, double spriteSize) {
+  public GridTile(int i, int j, TileType terrainType, TileType entityType, int visitType, double spriteSize) {
 
     this.i = i;
     this.j = j;
@@ -39,7 +39,14 @@ public class GridTile extends StackPane {
       getChildren().add(sprite);
     }
 
-    setStyle(String.format("-fx-border-color: %s; -fx-border-width: %f", (isVisited) ? "lime" : "darkgrey",  borderWidth));
+    String color = "";
+    switch(visitType) {
+      case 0 -> color = "darkgrey";
+      case 1 -> color = "red";
+      case 2 -> color = "blue";
+    }
+
+    setStyle(String.format("-fx-border-color: %s; -fx-border-width: %f", color,  borderWidth));
   }
 } 
 

@@ -26,6 +26,7 @@ public class ControlMenu extends VBox implements PublishSubscribe {
       double gridHeight,
       int[][] terrainGrid,
       int[][] entityGrid,
+      int[][] visited,
       TileSelectorType currentTileType) {
 
     getChildren().clear();

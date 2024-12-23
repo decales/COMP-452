@@ -23,6 +23,7 @@ public class GridView extends GridPane implements PublishSubscribe {
       double gridHeight,
       int[][] terrainGrid,
       int[][] entityGrid,
+      int[][] visited,
       TileSelectorType currentSelectorType) {
 
     getChildren().clear();
@@ -48,7 +49,7 @@ public class GridView extends GridPane implements PublishSubscribe {
           case 3 -> entityType = TileType.Obstacle;
         }
         
-        GridTile tile = new GridTile(i, j, terrainType, entityType, gridHeight / tileCount - tileSpacing);
+        GridTile tile = new GridTile(i, j, terrainType, entityType, visited[i][j], gridHeight / tileCount - tileSpacing);
         tile.setOnMouseClicked(controller::handleMouseClicked); 
         add(tile, i, j);
       }

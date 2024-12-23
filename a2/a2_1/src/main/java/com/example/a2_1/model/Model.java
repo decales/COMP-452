@@ -16,13 +16,15 @@ public class Model {
   private int[][] terrainGrid;
   private int[][] entityGrid;
   private int character_i, character_j;
+  private int character_i_init, character_j_init;
   private int goal_i, goal_j;
 
   private PriorityQueue<AStarNode> nextVisit;
-  private boolean visited[][];
+  private int visited[][];
   private int hCosts[][];
   private int gCosts[][];
   private int[][] traversalDirections;
+  private int pathLength;
 
   public Model(double rootHeight) {
 
@@ -41,7 +43,7 @@ public class Model {
 
     // A* algorithm data
     nextVisit = new PriorityQueue<>();
-    visited = new boolean[16][16];
+    visited = new int[16][16];
     gCosts = new int[16][16]; // Cumulative path costs from starting node
     for(int i = 0; i < gCosts.length; i ++) Arrays.fill(gCosts[i], Integer.MAX_VALUE);
     hCosts = new int[16][16]; // Heuristic costs from each node to goal node
@@ -71,7 +73,28 @@ public class Model {
   }
 
   public void startSearch() {
-    System.out.println(AStarSearch());
+
+    // Save start position of character
+    character_i_init = character_i;
+    character_j_init = character_j;
+
+    pathLength = AStarSearch();
+    System.out.println(pathLength);
+    updateSubcribers();
+    reset();
+  }
+
+  public void reset() {
+    character_i = character_i_init;
+    character_j = character_j_init;
+    pathLength = 0;
+    nextVisit.clear();
+
+    for (int i = 0; i < terrainGrid.length; i++) {
+      Arrays.fill(visited[i], 0);
+      Arrays.fill(hCosts[i], 0);
+      Arrays.fill(gCosts[i], Integer.MAX_VALUE);
+    }
   }
 
   private int AStarSearch() {
@@ -81,11 +104,11 @@ public class Model {
 
     while(!nextVisit.isEmpty()) {
       AStarNode currentNode = nextVisit.poll();
-      visited[currentNode.i][currentNode.j] = true;
+      visited[currentNode.i][currentNode.j] = 1;
 
       // Current node is goal node
       if (currentNode.posAt(goal_i, goal_j)) {
-        // retracePath(currentNode);
+        retracePath(currentNode);
         return gCosts[goal_i][goal_j];
       }
 
@@ -95,7 +118,7 @@ public class Model {
         int adj_j = currentNode.j + direction[1];
 
         if (adj_i >= 0 && adj_i < terrainGrid.length && adj_j >= 0 && adj_j < terrainGrid[0].length) { // check if adjacent is in bounds
-          if (entityGrid[adj_i][adj_j] != 3 && !visited[adj_i][adj_j]) { // check if adjacent is visited or an obstacle
+          if (entityGrid[adj_i][adj_j] != 3 && visited[adj_i][adj_j] != 1) { // check if adjacent is visited or an obstacle
             
             int previousCost = gCosts[adj_i][adj_j];
             int newCost = gCosts[currentNode.i][currentNode.j] + terrainGrid[adj_i][adj_j];
@@ -117,11 +140,10 @@ public class Model {
 
   public void retracePath(AStarNode goalNode) {
 
-    ArrayList<AStarNode> path = new ArrayList<>();
-
     AStarNode currentNode = goalNode;
-    while(currentNode.previousNode != null) {
-      path.add(currentNode);
+    while(currentNode != null) {
+      visited[currentNode.i][currentNode.j] = 2;
+      currentNode = currentNode.previousNode;
     }
   }
 
@@ -166,6 +188,6 @@ public class Model {
   }
 
   private void updateSubcribers() {
-    subscribers.forEach(subcriber -> subcriber.update(rootHeight, terrainGrid, entityGrid, currentSelectorType));
+    subscribers.forEach(subcriber -> subcriber.update(rootHeight, terrainGrid, entityGrid, visited, currentSelectorType));
   }
 }
