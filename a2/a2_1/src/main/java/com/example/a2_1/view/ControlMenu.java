@@ -7,14 +7,26 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
+
 public class ControlMenu extends VBox implements PublishSubscribe {
   
-  private Controller controller;
+  private StartResetButton button;
+  private Label pathValue;
 
   public ControlMenu(Controller controller) {
-    this.controller = controller;
+    
+    VBox pathBox = new VBox();
+    Label pathLabel = new Label("Length");
+    
+    button = new StartResetButton(0);
+    button.setOnMouseClicked(controller::handleMouseClicked);
+
+    pathValue = new Label();
+    pathBox.setAlignment(Pos.CENTER);
+    pathBox.getChildren().addAll(pathLabel, pathValue);
+
+    getChildren().addAll(button, pathBox);
     setAlignment(Pos.CENTER);
-    // setStyle("-fx-background-color: red;");
   }
 
   @Override
@@ -27,17 +39,11 @@ public class ControlMenu extends VBox implements PublishSubscribe {
       boolean animationStarted,
       int pathLength) {
 
-    getChildren().clear();
-
     setPrefHeight(gridHeight * 0.2);
     setSpacing(getPrefHeight() * 0.1);
 
-    StartResetButton button = new StartResetButton(0, animationStarted);
-    button.setOnMouseClicked(controller::handleMouseClicked);
-
-    VBox pathBox = new VBox();
+    button.setMode(animationStarted);
     
-    Label pathLabel = new Label("Length");
     String pathString = "";
     switch (pathLength) {
       case 0 -> pathString = "N/A";
@@ -45,11 +51,6 @@ public class ControlMenu extends VBox implements PublishSubscribe {
       case -2 -> pathString = "...";
       default -> pathString = Integer.toString(pathLength);
     }
-    Label pathNumber = new Label(pathString);
-    
-    pathBox.setAlignment(Pos.CENTER);
-    pathBox.getChildren().addAll(pathLabel, pathNumber);
-
-    getChildren().addAll(button, pathBox);
+    pathValue.setText(pathString);
   }
 }

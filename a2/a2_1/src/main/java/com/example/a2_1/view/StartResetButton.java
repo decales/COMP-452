@@ -7,8 +7,11 @@ public class StartResetButton extends Button {
   public enum ButtonMode { Start, Reset };
   public ButtonMode buttonMode;
 
-  public StartResetButton(double size, boolean animationStarted) {
+  public StartResetButton(double size) {
+    buttonMode = ButtonMode.Start;
+  }
 
+  public void setMode(boolean animationStarted) {
     buttonMode = (animationStarted) ? ButtonMode.Reset : ButtonMode.Start;
     setText((animationStarted) ? "Reset" : "Start"); 
   }

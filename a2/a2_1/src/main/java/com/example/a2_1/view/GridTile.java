@@ -1,48 +1,68 @@
 package com.example.a2_1.view;
 
 import java.util.List;
+
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 
 public class GridTile extends StackPane {
   
-  public enum TileType { Terrain, Grassland, Swamp, Character, Obstacle, Goal, None};
+  public enum TileType { Terrain, Grassland, Swamp, Character, Obstacle, Goal };
 
-  public boolean isVisited;
   public int i, j;
+  private ImageView terrainSprite;
+  private ImageView entitySprite;
+  private double spriteSize;
 
-  public GridTile(int i, int j, TileType terrainType, TileType entityType, int visitType, double spriteSize) {
-
+  public GridTile(int i, int j) {
     this.i = i;
     this.j = j;
 
-    double borderWidth = spriteSize * 0.075;
+    terrainSprite = new ImageView();
+    entitySprite = new ImageView();
+    getChildren().addAll(terrainSprite, entitySprite);
+  }
 
-    for (TileType tileType : List.of(terrainType, entityType)) {
+  public void setSize(double spriteSize) {
+    this.spriteSize = spriteSize;
+    for (ImageView sprite : List.of(terrainSprite, entitySprite)) {
+      sprite.setFitWidth(spriteSize - spriteSize * 0.075);
+      sprite.setFitHeight(spriteSize - spriteSize * 0.075);
+    }
+  }
+
+  public void setTerrainSprite(TileType terrainType) {
+    terrainSprite.setImage(new Image(getSpriteSource(terrainType)));
+  }
+  
+  public void setEntitySprite(TileType entityType) {
+    String entitySource = getSpriteSource(entityType);
+    entitySprite.setImage( (entitySource.isEmpty()) ? null : new Image(entitySource));
+  }
+
+  private String getSpriteSource(TileType tileType) {
       String spriteSource = "";
       switch(tileType) {
-        case None -> { continue;}
         case Terrain -> spriteSource = "terrain.png";
         case Grassland -> spriteSource = "grassland.png";
         case Swamp -> spriteSource = "swamp.png";
         case Character -> spriteSource = "black-ant.png";
         case Goal -> spriteSource = "blueberry.png";
         case Obstacle -> spriteSource = "red-ant.png";
+        case null -> {}
       }
-      ImageView sprite = new ImageView(new Image(spriteSource));
-      sprite.setFitWidth(spriteSize - borderWidth);
-      sprite.setFitHeight(spriteSize - borderWidth);
-      getChildren().add(sprite);
-    }
+      return spriteSource;
+  }
 
+  public void setBorderColour(int visitType) {
     String color = "";
     switch(visitType) {
       case 0, 1 -> color = "darkgrey";
-      case 2 -> color = "red";
-      case 3 -> color = "blue";
+      case 2 -> color = "orange";
+      case 3 -> color = "dodgerblue";
     }
-    setStyle(String.format("-fx-border-color: %s; -fx-border-width: %f", color,  borderWidth));
+    setStyle(String.format("-fx-border-color: %s; -fx-border-width: %f", color,  spriteSize * 0.075));
   }
 } 
 

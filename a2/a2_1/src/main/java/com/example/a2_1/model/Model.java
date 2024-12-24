@@ -91,8 +91,7 @@ public class Model {
     animationStarted = true;
     pathLength = -2; // temporary value for UI purposes
     int _pathLength = AStarSearch();
-    animateTraversal();
-    pathLength = _pathLength; // Shadow variable so UI isn't updated until animation finishes
+    animateTraversal(8, _pathLength);
   }
 
   public void reset() {
@@ -169,7 +168,7 @@ public class Model {
       return Math.abs(delta_i - delta_j);
   }
 
-  private void animateTraversal() {
+  private void animateTraversal(int fps, int pathLength) {
     animationTimer = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
       AStarNode currentNode = visitOrder.poll();
       visited[currentNode.i][currentNode.j] = 2;
@@ -177,7 +176,11 @@ public class Model {
       if (currentNode.equals(new AStarNode(goal_i, goal_j, 0, null))) retracePath(currentNode);
       updateSubcribers();
     }));
-    animationTimer.setRate(16);
+    animationTimer.setOnFinished(event -> {
+      this.pathLength = pathLength;
+      updateSubcribers();
+    });
+    animationTimer.setRate(fps);
     animationTimer.setCycleCount(visitOrder.size());
     animationTimer.play();
   }

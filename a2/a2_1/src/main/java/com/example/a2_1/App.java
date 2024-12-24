@@ -17,14 +17,15 @@ public class App extends Application {
     @Override
     public void start(Stage stage) {
 
-        double displayHeight = Screen.getPrimary().getBounds().getHeight();
+        int gridDimension = 16;
 
+        double displayHeight = Screen.getPrimary().getBounds().getHeight();
         double displayRatio = 0.8;
         double rootPaddingRatio = 0.05;        
         double gridSpacingRatio = 0.05;
 
         double rootPadding = (rootPaddingRatio * displayHeight * displayRatio) / 2;
-        double tileSpacing = (gridSpacingRatio * displayHeight * displayRatio) / 16;
+        double tileSpacing = (gridSpacingRatio * displayHeight * displayRatio) / gridDimension;
         double gridHeight = (displayHeight * displayRatio) - rootPadding * 2;
 
         Model model = new Model(gridHeight);
@@ -37,7 +38,7 @@ public class App extends Application {
         root.setStyle("-fx-background-color: lightgrey");
 
         // Grid
-        GridView gridView = new GridView(controller, tileSpacing);
+        GridView gridView = new GridView(controller, tileSpacing, gridDimension);
         
         // Side menu
         AnchorPane sideMenu = new AnchorPane();

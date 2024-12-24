@@ -10,8 +10,10 @@ public class TileSelector extends StackPane {
   public enum TileSelectorType { Terrain, Grassland, Swamp, Obstacle, Character, Goal };
 
   public TileSelectorType selectorType;
+  private ImageView sprite;
+  private double borderWidth;
 
-  public TileSelector(TileSelectorType selectorType, boolean isSelected, boolean animationStarted, double spriteSize) {
+  public TileSelector(TileSelectorType selectorType) {
     
     this.selectorType = selectorType;
 
@@ -25,23 +27,29 @@ public class TileSelector extends StackPane {
       case Goal -> spriteSource = "blueberry.png";
     }
 
-    ImageView sprite = new ImageView(new Image(spriteSource));
-    double borderWidth = spriteSize * 0.075;
+    sprite = new ImageView(new Image(spriteSource));
+    getChildren().add(sprite);
+  }
+
+  public void setSize(double spriteSize) {
+    borderWidth = spriteSize * 0.075;
     sprite.setFitWidth(spriteSize - borderWidth);
     sprite.setFitHeight(spriteSize - borderWidth);
-    getChildren().add(sprite);
+  }
 
-    // 'Grey-out' button when animation is started to show it is not clickable
-    if (animationStarted) {
-      ColorAdjust greyScaleFilter = new ColorAdjust();
-      greyScaleFilter.setSaturation(-1);
-      sprite.setEffect(greyScaleFilter);
-    }
-    
+  public void setBorderColour(boolean isSelected) {
     setStyle(String.format(
           "-fx-border-color: %s;" +
           "-fx-border-width: %f;" +
           "-fx-background-color: darkgrey",
-          (isSelected && !animationStarted) ? "magenta" : "grey", borderWidth));
+          isSelected && !isDisable() ? "magenta" : "grey", borderWidth));
   }
+
+  public void setEnabled(boolean animationStarted) {
+    // 'Grey-out' button when animation is started to show it is not clickable
+    ColorAdjust greyScaleFilter = new ColorAdjust();
+    greyScaleFilter.setSaturation((!animationStarted) ? 0 : -1);
+    sprite.setEffect(greyScaleFilter);
+    setDisable(animationStarted);
+  } 
 }

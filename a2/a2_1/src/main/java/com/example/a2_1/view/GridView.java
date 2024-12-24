@@ -4,18 +4,29 @@ import com.example.a2_1.Controller;
 import com.example.a2_1.model.PublishSubscribe;
 import com.example.a2_1.view.GridTile.TileType;
 import com.example.a2_1.view.TileSelector.TileSelectorType;
+import javafx.scene.Node;
 import javafx.scene.layout.GridPane;
 
 public class GridView extends GridPane implements PublishSubscribe {
 
   private double tileSpacing;
-  private Controller controller;
+  private int gridDimension;
 
-  public GridView(Controller controller, double tileSpacing) {
-    this.controller = controller;
+  public GridView(Controller controller, double tileSpacing, int gridDimension) {
+
     this.tileSpacing = tileSpacing;
+    this.gridDimension = gridDimension;
+
     setHgap(this.tileSpacing);
     setVgap(this.tileSpacing);
+    
+    for (int i = 0; i < gridDimension; i++) {
+      for (int j = 0; j < gridDimension; j++) {
+        GridTile tile = new GridTile(i, j);
+        tile.setOnMouseClicked(controller::handleMouseClicked);
+        add(tile, i, j);
+      }
+    }
   }
 
   @Override
@@ -28,33 +39,30 @@ public class GridView extends GridPane implements PublishSubscribe {
       boolean animationStarted,
       int pathLength) {
 
-    getChildren().clear();
+    for (Node child : getChildren()) {
+      GridTile tile = (GridTile) child;
 
-    int tileCount = terrainGrid.length;
-    for (int i = 0; i < tileCount; i++) {
-      for (int j = 0; j < tileCount; j++) {
+      tile.setSize(gridHeight / gridDimension - tileSpacing);
+      tile.setBorderColour(visited[tile.i][tile.j]);
+      tile.setDisable(animationStarted); // Cannot modify tiles when animation is running;
 
-        // Determine tile terrain type
+      if (!animationStarted) { // Only set terrain when animation is not running
         TileType terrainType = null;
-        switch(terrainGrid[i][j]) {
+        switch(terrainGrid[tile.i][tile.j]) {
           case 1 -> terrainType = TileType.Terrain;
           case 3 -> terrainType = TileType.Grassland;
           case 4 -> terrainType = TileType.Swamp;
         } 
-
-        // Determine if tile contains an entity
-        TileType entityType = null;
-        switch(entityGrid[i][j]) {
-          case 0 -> entityType = TileType.None;
-          case 1 -> entityType = TileType.Character;
-          case 2 -> entityType = TileType.Goal;
-          case 3 -> entityType = TileType.Obstacle;
-        }
-        
-        GridTile tile = new GridTile(i, j, terrainType, entityType, visited[i][j], gridHeight / tileCount - tileSpacing);
-        if (!animationStarted) tile.setOnMouseClicked(controller::handleMouseClicked); // Tiles only clickable when animation is not started
-        add(tile, i, j);
+        tile.setTerrainSprite(terrainType);
       }
+
+      TileType entityType = null;
+      switch(entityGrid[tile.i][tile.j]) {
+        case 1 -> entityType = TileType.Character;
+        case 2 -> entityType = TileType.Goal;
+        case 3 -> entityType = TileType.Obstacle;
+      }
+      tile.setEntitySprite(entityType);
     }
   }
 }
