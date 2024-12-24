@@ -1,5 +1,6 @@
 package com.example.a2_1.view;
 
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
@@ -10,7 +11,7 @@ public class TileSelector extends StackPane {
 
   public TileSelectorType selectorType;
 
-  public TileSelector(TileSelectorType selectorType, boolean isSelected, double spriteSize) {
+  public TileSelector(TileSelectorType selectorType, boolean isSelected, boolean animationStarted, double spriteSize) {
     
     this.selectorType = selectorType;
 
@@ -29,11 +30,18 @@ public class TileSelector extends StackPane {
     sprite.setFitWidth(spriteSize - borderWidth);
     sprite.setFitHeight(spriteSize - borderWidth);
     getChildren().add(sprite);
+
+    // 'Grey-out' button when animation is started to show it is not clickable
+    if (animationStarted) {
+      ColorAdjust greyScaleFilter = new ColorAdjust();
+      greyScaleFilter.setSaturation(-1);
+      sprite.setEffect(greyScaleFilter);
+    }
     
     setStyle(String.format(
           "-fx-border-color: %s;" +
           "-fx-border-width: %f;" +
           "-fx-background-color: darkgrey",
-          (isSelected) ? "magenta" : "grey", borderWidth));
+          (isSelected && !animationStarted) ? "magenta" : "grey", borderWidth));
   }
 }

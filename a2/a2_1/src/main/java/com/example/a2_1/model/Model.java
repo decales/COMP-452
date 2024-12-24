@@ -2,10 +2,14 @@ package com.example.a2_1.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
-
+import java.util.Queue;
 import com.example.a2_1.view.TileSelector.TileSelectorType;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.util.Duration;
 
 public class Model {
 
@@ -13,14 +17,17 @@ public class Model {
   private double rootHeight;
   private TileSelectorType currentSelectorType;
   private boolean animationStarted;
+  private Timeline animationTimer;
   
   private int[][] terrainGrid;
   private int[][] entityGrid;
   private int character_i, character_j;
   private int character_i_init, character_j_init;
   private int goal_i, goal_j;
+  private int goal_i_init, goal_j_init;
 
   private PriorityQueue<AStarNode> nextVisit;
+  private Queue<AStarNode> visitOrder;
   private int visited[][];
   private int hCosts[][];
   private int gCosts[][];
@@ -44,6 +51,7 @@ public class Model {
 
     // A* algorithm data
     nextVisit = new PriorityQueue<>();
+    visitOrder = new LinkedList<>(); // Node visit order stack for animation purposes
     visited = new int[16][16];
     gCosts = new int[16][16]; // Cumulative path costs from starting node
     for(int i = 0; i < gCosts.length; i ++) Arrays.fill(gCosts[i], Integer.MAX_VALUE);
@@ -74,19 +82,26 @@ public class Model {
   }
 
   public void start() {
-    // Save start position of character for reset
+    // Save start position of character and goal for reset
     character_i_init = character_i;
     character_j_init = character_j;
+    goal_i_init = goal_i;
+    goal_j_init = goal_j;
+
     animationStarted = true;
-    pathLength = AStarSearch();
-    updateSubcribers();
+    pathLength = -2; // temporary value for UI purposes
+    int _pathLength = AStarSearch();
+    animateTraversal();
+    pathLength = _pathLength; // Shadow variable so UI isn't updated until animation finishes
   }
 
   public void reset() {
-    character_i = character_i_init;
-    character_j = character_j_init;
-    nextVisit.clear();
+    animationTimer.stop();
     animationStarted = false;
+    updateCharacterPos(character_i_init, character_j_init);
+    updateGoalPos(goal_i_init, goal_j_init);
+    nextVisit.clear();
+    visitOrder.clear();
     pathLength = 0;
 
     for (int i = 0; i < terrainGrid.length; i++) {
@@ -103,12 +118,12 @@ public class Model {
     nextVisit.add(new AStarNode(character_i, character_j, 0, null)); // fCost doesn't matter
 
     while(!nextVisit.isEmpty()) {
-      AStarNode currentNode = nextVisit.poll();
+      AStarNode currentNode = nextVisit.poll(); //  retrieve next best node
+      visitOrder.add(currentNode);
       visited[currentNode.i][currentNode.j] = 1;
 
       // Current node is goal node
       if (currentNode.posAt(goal_i, goal_j)) {
-        retracePath(currentNode);
         return gCosts[goal_i][goal_j];
       }
 
@@ -135,14 +150,14 @@ public class Model {
         } 
       }
     }
-    return 0; // Goal never reached, no possible path
+    return -1; // Goal never reached, no possible path
   }
 
-  public void retracePath(AStarNode goalNode) {
-    // retrace from the goal node to determine the shortest path, using visisted array
+  private void retracePath(AStarNode goalNode) {
+    // retrace from the goal node to determine the shortest path, using visited array
     AStarNode currentNode = goalNode;
     while(currentNode != null) {
-      visited[currentNode.i][currentNode.j] = 2;
+      visited[currentNode.i][currentNode.j] = 3;
       currentNode = currentNode.previousNode;
     }
   }
@@ -151,13 +166,24 @@ public class Model {
       // Count minimum nodes away the current is from the goal, the heuristic cost
       int delta_i = Math.abs(i - goal_i);
       int delta_j = Math.abs(j - goal_j);
-      int higher = Math.max(delta_i, delta_j);
-      int lower = Math.min(delta_i, delta_j);
-      return higher - lower; 
+      return Math.abs(delta_i - delta_j);
+  }
+
+  private void animateTraversal() {
+    animationTimer = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
+      AStarNode currentNode = visitOrder.poll();
+      visited[currentNode.i][currentNode.j] = 2;
+      updateCharacterPos(currentNode.i, currentNode.j);
+      if (currentNode.equals(new AStarNode(goal_i, goal_j, 0, null))) retracePath(currentNode);
+      updateSubcribers();
+    }));
+    animationTimer.setRate(16);
+    animationTimer.setCycleCount(visitOrder.size());
+    animationTimer.play();
   }
 
   private boolean updateCharacterPos(int i, int j) {
-    if (entityGrid[i][j] == 2) return false; // Do not allow placing character on goal
+    if (!animationStarted && entityGrid[i][j] == 2) return false; // Do not allow placing character on goal (excluding animation)
     entityGrid[character_i][character_j] = 0;
     entityGrid[i][j] = 1;
     character_i = i;
@@ -188,7 +214,7 @@ public class Model {
   }
 
   private void updateSubcribers() {
-    subscribers.forEach(subcriber -> subcriber.update(
-          rootHeight, terrainGrid, entityGrid, visited, currentSelectorType, animationStarted, pathLength));
+    subscribers.forEach(subcriber -> 
+        subcriber.update(rootHeight, terrainGrid, entityGrid, visited, currentSelectorType, animationStarted, pathLength));
   }
 }

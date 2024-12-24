@@ -36,8 +36,17 @@ public class ControlMenu extends VBox implements PublishSubscribe {
     button.setOnMouseClicked(controller::handleMouseClicked);
 
     VBox pathBox = new VBox();
+    
     Label pathLabel = new Label("Length");
-    Label pathNumber = new Label(Integer.toString(pathLength));
+    String pathString = "";
+    switch (pathLength) {
+      case 0 -> pathString = "N/A";
+      case -1 -> pathString = "None";
+      case -2 -> pathString = "...";
+      default -> pathString = Integer.toString(pathLength);
+    }
+    Label pathNumber = new Label(pathString);
+    
     pathBox.setAlignment(Pos.CENTER);
     pathBox.getChildren().addAll(pathLabel, pathNumber);
 

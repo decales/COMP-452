@@ -34,7 +34,7 @@ public class TileMenu extends VBox implements PublishSubscribe {
   
     // Draw tile selector buttons
     for (TileSelectorType type : TileSelectorType.values()) {
-      TileSelector selector = new TileSelector(type, type.equals(currentSelectorType), gridHeight * 0.0667);
+      TileSelector selector = new TileSelector(type, type.equals(currentSelectorType), animationStarted, gridHeight * 0.0667);
       if (!animationStarted) selector.setOnMouseClicked(controller::handleMouseClicked); // Tiles only clickable when animation not started
       getChildren().add(selector);
     } 
