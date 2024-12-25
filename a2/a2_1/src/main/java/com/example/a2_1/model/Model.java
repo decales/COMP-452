@@ -18,6 +18,7 @@ public class Model {
   private TileSelectorType currentSelectorType;
   private boolean animationStarted;
   private Timeline animationTimer;
+  private int animationSpeed;
   
   private int[][] terrainGrid;
   private int[][] entityGrid;
@@ -40,6 +41,7 @@ public class Model {
     subscribers = new ArrayList<>();
     this.rootHeight = rootHeight;
     currentSelectorType = TileSelectorType.Terrain;
+    animationSpeed = 8;
 
     // Grid data
     terrainGrid = new int[16][16]; // represents the type of terrain at each tile
@@ -81,6 +83,16 @@ public class Model {
     updateSubcribers();
   }
 
+  public void clearGrid() {
+    for (int i = 0; i < terrainGrid.length; i++) {
+      Arrays.fill(terrainGrid[i], 1); // Set all terrain back to default
+      for (int j = 0; j < entityGrid.length; j++) {
+        if (entityGrid[i][j] == 3) entityGrid[i][j] = 0; // Clear obstacles only
+      }
+    } 
+    updateSubcribers();
+  }
+
   public void start() {
     // Save start position of character and goal for reset
     character_i_init = character_i;
@@ -90,8 +102,9 @@ public class Model {
 
     animationStarted = true;
     pathLength = -2; // temporary value for UI purposes
+    updateSubcribers();
     int _pathLength = AStarSearch();
-    animateTraversal(8, _pathLength);
+    animateTraversal(_pathLength);
   }
 
   public void reset() {
@@ -111,16 +124,17 @@ public class Model {
     updateSubcribers();
   }
 
+  public void setAnimationSpeed(int animationSpeed) {
+    this.animationSpeed = animationSpeed;
+  }
+
   private int AStarSearch() {
     // Starting node
     gCosts[character_i][character_j] = terrainGrid[character_i][character_j];
     nextVisit.add(new AStarNode(character_i, character_j, 0, null)); // fCost doesn't matter
 
     while(!nextVisit.isEmpty()) {
-      nextVisit.forEach(e -> System.out.print(String.format("[%d,%d]:%d", e.i, e.j, e.fCost) + " "));
-      System.out.println();
       AStarNode currentNode = nextVisit.poll(); //  retrieve next best node
-      System.out.println("next best: " + String.format("[%d,%d]:%d", currentNode.i, currentNode.j, currentNode.fCost) + '\n');
       visitOrder.add(currentNode);
       visited[currentNode.i][currentNode.j] = 1;
 
@@ -171,7 +185,7 @@ public class Model {
       return Math.max(delta_i, delta_j);
   }
 
-  private void animateTraversal(int fps, int pathLength) {
+  private void animateTraversal(int pathLength) {
     animationTimer = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
       AStarNode currentNode = visitOrder.poll();
       visited[currentNode.i][currentNode.j] = 2;
@@ -183,7 +197,7 @@ public class Model {
       this.pathLength = pathLength;
       updateSubcribers();
     });
-    animationTimer.setRate(fps);
+    animationTimer.setRate(animationSpeed);
     animationTimer.setCycleCount(visitOrder.size());
     animationTimer.play();
   }
