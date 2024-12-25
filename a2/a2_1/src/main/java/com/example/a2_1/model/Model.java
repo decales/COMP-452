@@ -117,7 +117,10 @@ public class Model {
     nextVisit.add(new AStarNode(character_i, character_j, 0, null)); // fCost doesn't matter
 
     while(!nextVisit.isEmpty()) {
+      nextVisit.forEach(e -> System.out.print(String.format("[%d,%d]:%d", e.i, e.j, e.fCost) + " "));
+      System.out.println();
       AStarNode currentNode = nextVisit.poll(); //  retrieve next best node
+      System.out.println("next best: " + String.format("[%d,%d]:%d", currentNode.i, currentNode.j, currentNode.fCost) + '\n');
       visitOrder.add(currentNode);
       visited[currentNode.i][currentNode.j] = 1;
 
@@ -163,9 +166,9 @@ public class Model {
 
   private int calculateHCost(int i, int j) {
       // Count minimum nodes away the current is from the goal, the heuristic cost
-      int delta_i = Math.abs(i - goal_i);
-      int delta_j = Math.abs(j - goal_j);
-      return Math.abs(delta_i - delta_j);
+      int delta_i = Math.abs(goal_i - i);
+      int delta_j = Math.abs(goal_j - j);
+      return Math.max(delta_i, delta_j);
   }
 
   private void animateTraversal(int fps, int pathLength) {

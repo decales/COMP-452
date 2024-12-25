@@ -1,7 +1,6 @@
 package com.example.a2_1.view;
 
 import java.util.List;
-
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
