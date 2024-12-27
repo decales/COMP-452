@@ -18,7 +18,7 @@ public class App extends Application {
         root.setPrefSize(width, height);
 
         Scene scene = new Scene(root, width, height);
-        stage.setTitle("Nub-evade!");
+        stage.setTitle("");
         stage.setScene(scene);
         stage.setResizable(false);
         stage.show();
