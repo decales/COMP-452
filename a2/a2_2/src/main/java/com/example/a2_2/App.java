@@ -1,4 +1,7 @@
-package com.example.a2;
+package com.example.a2_2;
+
+import com.example.a2_2.model.Model;
+import com.example.a2_2.view.EnvironmentGrid;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -13,9 +16,17 @@ public class App extends Application {
         double scale = 0.8;
         double width = Screen.getPrimary().getBounds().getWidth() * scale;
         double height = Screen.getPrimary().getBounds().getHeight() * scale;
+
+        Model model = new Model(width, height, 32, 6);
         
         StackPane root = new StackPane();
         root.setPrefSize(width, height);
+
+        EnvironmentGrid grid = new EnvironmentGrid();
+
+        root.getChildren().addAll(grid);
+
+        model.addSubscribers(grid);
 
         Scene scene = new Scene(root, width, height);
         stage.setTitle("");
