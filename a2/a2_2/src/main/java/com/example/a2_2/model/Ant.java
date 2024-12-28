@@ -6,27 +6,35 @@ public class Ant {
 
   public enum AntState { SearchingFood, ReturningHome, SearchingWater }
 
-  public int posY, posX;
+  public GridPosition position;
   public AntState state;
+  private int[][] traversalDirections;
   
   private Random random;
   
-  public Ant() {
+  public Ant(GridPosition position) {
 
+    this.position = position;
+    state = AntState.SearchingFood;
+    
+    traversalDirections = new int[][] { {0,0}, {0,1}, {0,-1}, {1,0}, {1,1}, {1,-1}, {-1,0}, {-1,1}, {-1,-1} };
     random = new Random();
-    state = AntState.SearchingFood; // Ants
+  }
+
+  public void move() {
+    switch(state) {
+      case SearchingFood, SearchingWater -> roam();
+      case ReturningHome -> path();
+    }
+  }
+
+  private void roam() {
+    // Choose a random direction to traverse
+    int[] randomDirection = traversalDirections[random.nextInt(traversalDirections.length - 1)];
 
   }
 
-  public void roam() {
-
-    // Choose random direction
-    // Choose random number of blocks to travel
-    // Choose random number of frames to delay before moving again
-
-  }
-
-  public void returnHome() {
+  private void path() {
 
   }
 }
