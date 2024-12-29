@@ -10,34 +10,34 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 public class App extends Application {
-    @Override
-    public void start(Stage stage) {
+  @Override
+  public void start(Stage stage) {
 
-        double scale = 0.8;
-        double width = Screen.getPrimary().getBounds().getWidth() * scale;
-        double height = Screen.getPrimary().getBounds().getHeight() * scale;
+    double scale = 0.8;
+    double width = Screen.getPrimary().getBounds().getWidth() * scale;
+    double height = Screen.getPrimary().getBounds().getHeight() * scale;
 
-        Model model = new Model(width, height, 32, 6);
-        
-        StackPane root = new StackPane();
-        root.setPrefSize(width, height);
+    Model model = new Model(width, height, 32, 4);
+    
+    StackPane root = new StackPane();
+    root.setPrefSize(width, height);
 
-        EnvironmentGrid grid = new EnvironmentGrid();
+    EnvironmentGrid grid = new EnvironmentGrid();
 
-        root.getChildren().addAll(grid);
+    root.getChildren().addAll(grid);
 
-        model.addSubscribers(grid);
+    model.addSubscribers(grid);
 
-        model.animate();
+    model.animate();
 
-        Scene scene = new Scene(root, width, height);
-        stage.setTitle("");
-        stage.setScene(scene);
-        stage.setResizable(false);
-        stage.show();
-    }
+    Scene scene = new Scene(root, width, height);
+    stage.setTitle("");
+    stage.setScene(scene);
+    stage.setResizable(false);
+    stage.show();
+  }
 
-    public static void main(String[] args) {
-        launch();
-    }
+  public static void main(String[] args) {
+    launch();
+  }
 }
