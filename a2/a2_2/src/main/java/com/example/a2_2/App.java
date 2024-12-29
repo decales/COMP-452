@@ -28,6 +28,8 @@ public class App extends Application {
 
         model.addSubscribers(grid);
 
+        model.animate();
+
         Scene scene = new Scene(root, width, height);
         stage.setTitle("");
         stage.setScene(scene);

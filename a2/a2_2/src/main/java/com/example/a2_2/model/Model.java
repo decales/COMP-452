@@ -34,26 +34,43 @@ public class Model {
   }
 
 
-  private void animate() {
+  public void animate() {
     animationTimer = new Timeline(new KeyFrame(Duration.seconds(1), event -> moveAnts()));
-    animationTimer.setRate(0.5);
+    animationTimer.setRate(2);
     animationTimer.setCycleCount(Animation.INDEFINITE);
     animationTimer.play();
   }
 
   private void moveAnts() {
-    
+    for (int i = 0; i < antPositionMap.values().size(); i++) {
+      Ant ant = (Ant) antPositionMap.values().toArray()[i];
+
+      GridPosition newPosition = null;
+      switch(ant.state) {
+        case SearchingFood, SearchingWater -> {
+          newPosition = ant.roam();
+          if (!moveAnt(ant, newPosition));
+          moveAnt(ant, new GridPosition(ant.position.y, ant.position.x));
+        }
+          
+        case ReturningHome -> {
+
+        }
+      }
+    }
+    updateSubscribers();
   }
 
   private boolean moveAnt(Ant ant, GridPosition newPosition) {
     // Cannot move to new position if it is outside of grid boundaries or another ant is already there
-    if (newPosition.y < 0 || newPosition.x >= environmentGrid.length ||
+    if (newPosition.y < 0 || newPosition.y >= environmentGrid.length ||
         newPosition.x < 0 || newPosition.x >= environmentGrid.length ||
         antPositionMap.containsKey(newPosition)
         ) return false;
 
-    antPositionMap.remove(ant.position); // Remove key at ant's previous position to show an ant is no longer positioned there
+    antPositionMap.remove(ant.position, ant); // Remove key at ant's previous position to show an ant is no longer positioned there
     antPositionMap.put(newPosition, ant); // Add a new key-value pair for ant and its new position
+    ant.position = newPosition;
     return true;
   }
 

@@ -8,7 +8,6 @@ public class Ant {
 
   public GridPosition position;
   public AntState state;
-  private int[][] traversalDirections;
   
   private Random random;
   
@@ -17,7 +16,6 @@ public class Ant {
     this.position = position;
     state = AntState.SearchingFood;
     
-    traversalDirections = new int[][] { {0,0}, {0,1}, {0,-1}, {1,0}, {1,1}, {1,-1}, {-1,0}, {-1,1}, {-1,-1} };
     random = new Random();
   }
 
@@ -28,10 +26,11 @@ public class Ant {
     }
   }
 
-  private void roam() {
+  public GridPosition roam() {
     // Choose a random direction to traverse
-    int[] randomDirection = traversalDirections[random.nextInt(traversalDirections.length - 1)];
-
+    int [][] traversalDirections = { {0,1}, {0,-1}, {1,0}, {1,1}, {1,-1}, {-1,0}, {-1,1}, {-1,-1} };
+    int[] randomDirection = traversalDirections[random.nextInt(traversalDirections.length)];
+    return new GridPosition(position.y + randomDirection[0], position.x + randomDirection[1]);
   }
 
   private void path() {
