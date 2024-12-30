@@ -4,8 +4,9 @@ import com.example.a2_2.model.Model;
 import com.example.a2_2.view.EnvironmentGrid;
 
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.HBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -14,15 +15,16 @@ public class App extends Application {
   public void start(Stage stage) {
 
     double scale = 0.8;
-    double width = Screen.getPrimary().getBounds().getWidth() * scale;
-    double height = Screen.getPrimary().getBounds().getHeight() * scale;
 
-    
-    int gridDimension = 32; // Create gridDimension * gridDimension grid
+    double windowSize = Screen.getPrimary().getBounds().getHeight() * scale;
+
+    int gridDimension = 16; // Create gridDimension * gridDimension grid
     int numAnts = 4;
-    Model model = new Model(height, gridDimension, numAnts);
+    Model model = new Model(windowSize, gridDimension, numAnts);
     
-    StackPane root = new StackPane();
+    HBox root = new HBox();
+    root.paddingProperty().set(new Insets(windowSize * 0.025));
+    root.setStyle("-fx-background-color: slategrey");
     EnvironmentGrid grid = new EnvironmentGrid();
 
     root.getChildren().addAll(grid);
@@ -31,6 +33,7 @@ public class App extends Application {
 
     Scene scene = new Scene(root);
     stage.setTitle("");
+    stage.setResizable(false);
     stage.setScene(scene);
     stage.show();
   }

@@ -10,7 +10,10 @@ import javafx.scene.layout.GridPane;
 
 public class EnvironmentGrid extends GridPane implements PublishSubscribe {
 
-  private void initGrid(TileType[][] environmentGrid) {
+  private void initGrid(TileType[][] environmentGrid, double borderSize) {
+
+    getChildren().clear();
+    setStyle("-fx-background-color: #2e4c2e; -fx-border-color: darkslategrey; -fx-border-width: " + borderSize);
 
     int gridDimension = environmentGrid.length;
     for (int i = 0; i < gridDimension; i++) {
@@ -21,12 +24,14 @@ public class EnvironmentGrid extends GridPane implements PublishSubscribe {
   }
 
   public void update(double windowSize, TileType[][] environmentGrid, HashMap<GridPosition, Ant> antPositionMap) {
-    // Create GridPane children nodes once
-    if (getChildren().isEmpty()) initGrid(environmentGrid);
 
-    double tileGap = windowSize *0.0005;
+    double tileSize = windowSize / environmentGrid.length;
+    double tileGap = tileSize *0.1;
     setHgap(tileGap);
     setVgap(tileGap);
+    
+    // Initialize GridPane children only when the grid dimenions change
+    if (Math.pow(environmentGrid.length, 2) != getChildren().size()) initGrid(environmentGrid, tileGap);
 
     // Update the GridPane children
     for (Node node : getChildren()) {
@@ -34,7 +39,7 @@ public class EnvironmentGrid extends GridPane implements PublishSubscribe {
 
       tile.setTerrainSprite(environmentGrid[tile.position.y][tile.position.x]);
       tile.setAntSprite(antPositionMap.get(new GridPosition(tile.position.y, tile.position.x)));
-      tile.setSize(windowSize / environmentGrid.length);
+      tile.setSize(tileSize);
     }
   }
 }

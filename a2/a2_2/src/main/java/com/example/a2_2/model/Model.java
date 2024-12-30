@@ -64,7 +64,6 @@ public class Model {
           else if (ant.isPaused) {
             ant.isPaused = false;
             generateAnts(1); // Spawn a new ant
-            generateTileType(TileType.Food, 2); // Spawn food to account for the new ant 
             ant.state = AntState.SearchingWater; // Ant is now thirsty
           }
         }
@@ -119,19 +118,27 @@ public class Model {
       ant.position = nextPosition;
     }
   }
+  
 
-  private void generateEnvironment(int numAnts) {
-    // Initialize grid and set all tiles to default terrain
-    for (int i = 0; i < environmentGrid.length; i++) Arrays.fill(environmentGrid[i], TileType.Default);
+  public void generateEnvironment(int numAnts) {
     
-    // Generate the rest of the tile types at varying ratios
-    generateTileType(TileType.Home, (int) (numAnts * 0.5));
-    generateTileType(TileType.Water, (int) (Math.pow(environmentGrid.length, 2) * 0.025));
-    generateTileType(TileType.Poison, (int) (Math.pow(environmentGrid.length, 2) * 0.025));
-    generateTileType(TileType.Food, (int) (numAnts * 2));
-    
-    // Place the starting amount of ants on the grid
-    generateAnts(numAnts);
+    // Only generate environment if less than 30% of the grid would be filled with Ants
+    double maxAntPercentage = 0.3;
+    if (antPositionMap.size() + numAnts < Math.floor(Math.pow(environmentGrid.length, 2) * maxAntPercentage)) {
+
+      // Initialize grid and set all tiles to default terrain
+      for (int i = 0; i < environmentGrid.length; i++) Arrays.fill(environmentGrid[i], TileType.Default);
+      
+      // Generate the rest of the tile types at varying ratios
+      generateTileType(TileType.Home, (int) Math.ceil((numAnts * 0.5))); // 0.5 * maxAnt% = 15% max
+      generateTileType(TileType.Water, (int) Math.ceil(Math.pow(environmentGrid.length, 2) * 0.025)); // 2.5% of grid
+      generateTileType(TileType.Poison, (int) Math.ceil(Math.pow(environmentGrid.length, 2) * 0.025)); // 2.5% of grid
+      generateTileType(TileType.Food, (int) Math.ceil((numAnts * 1.5))); // 1.5 * maxAnt% = 45% max
+      
+      // Maximum occupied tiles % = 15 + 2.5 + 2.5 + 45 = 65%
+      // Ants only spawn on empty terrain, which is the remaining 35% of the grid (with 5% leftover)
+      generateAnts(numAnts);
+    }
   }
 
   private void generateTileType(TileType tileType, int numTiles) {
@@ -147,13 +154,16 @@ public class Model {
   }
 
   private void generateAnts(int numAnts) {
-    while (numAnts > 0) {
-      GridPosition startPosition = new GridPosition(random.nextInt(environmentGrid.length), random.nextInt(environmentGrid.length));
+    // Redundant check needed based on how this function is used to an ant when another ant brings food home
+    if (antPositionMap.size() + numAnts < Math.floor(Math.pow(environmentGrid.length, 2) * 0.3)) {
+      while (numAnts > 0) {
+        GridPosition startPosition = new GridPosition(random.nextInt(environmentGrid.length), random.nextInt(environmentGrid.length));
 
-      // Only place an ant on default terrain that does not already contain another ant
-      if (environmentGrid[startPosition.y][startPosition.x] == TileType.Default && !antPositionMap.containsKey(startPosition)) {
-        antPositionMap.put(startPosition, new Ant(startPosition));
-        numAnts--;
+        // Only place an ant on default terrain that does not already contain another ant
+        if (environmentGrid[startPosition.y][startPosition.x] == TileType.Default && !antPositionMap.containsKey(startPosition)) {
+          antPositionMap.put(startPosition, new Ant(startPosition));
+          numAnts--;
+        }
       }
     }
   }
