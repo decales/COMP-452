@@ -1,20 +1,20 @@
 package com.example.a2_2.model;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Random;
-import java.util.Set;
 
 public class Ant {
 
-  public enum AntState { SearchingFood, ReturningHome, SearchingWater, Paused }
+  public enum AntState { SearchingFood, ReturningHome, SearchingWater}
 
   public GridPosition position;
   public AntState state;
+  public boolean isPaused;
+  public double rotationAngle;
   private Queue<GridPosition> nextPositionQueue;
   private int[][] directions;
   private Random random;
@@ -29,17 +29,18 @@ public class Ant {
   }
 
   public GridPosition getNextPosition(ArrayList<GridPosition> homePositions) {
+    // isPaused used to keep an ant in place so it is visually clear when it dies or picks up food after a frame update
+    if (isPaused) { return new GridPosition (position.y, position.x); };
     if (nextPositionQueue.isEmpty()) {
       switch(state) {
-        // Pause state used to keep an ant in place so it is visually clear when it dies or picks up food after a frame update
-        case Paused -> nextPositionQueue.add(new GridPosition(position.y, position.x)); 
         case SearchingFood, SearchingWater -> roam();
         case ReturningHome -> path(homePositions);
       }
     }
-    return nextPositionQueue.poll();
+    GridPosition nextPosition = nextPositionQueue.poll();
+    getRotationAngle(nextPosition);
+    return nextPosition;
   }
-
 
   private void roam() {
     // Choose a random adjacent tile and add it to next position queue
@@ -47,7 +48,6 @@ public class Ant {
     nextPositionQueue.add(new GridPosition(position.y + randomDirection[0], position.x + randomDirection[1]));
   }
 
-    
   public void path(ArrayList<GridPosition> homePositions) {
     // Path directly to path to nearest homePosition using BFS and add each tile along path to next position queue
       
@@ -90,5 +90,20 @@ public class Ant {
       nextPosition = previousPosition.get(nextPosition);
     }
     nextPositionQueue.addAll(pathToClosestHome);
+  }
+
+  public void getRotationAngle(GridPosition nextPosition) {
+    // Used solely for cosmetic purposes so the ant is always facing the direction is travelled on each frame update
+    int deltaY = nextPosition.y - position.y;
+    int deltaX = nextPosition.x - position.x;
+
+    if (deltaY == -1 && deltaX == 0) rotationAngle = 0;   // Up
+    else if (deltaY == -1 && deltaX == 1) rotationAngle = 45;  // Up-right
+    else if (deltaY == 0 && deltaX == 1) rotationAngle = 90;   // Right
+    else if (deltaY == 1 && deltaX == 1) rotationAngle = 135;  // Down-right
+    else if (deltaY == 1 && deltaX == 0) rotationAngle = 180;  // Down
+    else if (deltaY == 1 && deltaX == -1) rotationAngle = 225; // Down-left
+    else if (deltaY == 0 && deltaX == -1) rotationAngle = 270; // Left
+    else if (deltaY == -1 && deltaX == -1) rotationAngle = 315; // Up-left
   }
 }

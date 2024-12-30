@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.example.a2_2.model.Ant;
 import com.example.a2_2.model.GridPosition;
+import com.example.a2_2.model.Ant.AntState;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -19,26 +20,36 @@ public class EnvironmentTile extends StackPane {
   private ImageView antSprite;
 
   public EnvironmentTile(TileType type, GridPosition position) {
-    
-    this.type = type;
+
     this.position = position;
 
-    terrainSprite = new ImageView(new Image(String.format("%s.png", type.toString().toLowerCase())));
-    antSprite = new ImageView(new Image("ant.png"));
+    terrainSprite = new ImageView();
+    setTerrainSprite(type);
+
+    antSprite = new ImageView("searchingfood.png");
     getChildren().addAll(terrainSprite, antSprite);
   }
 
-  public void updateTile(Ant antAtTile, double size) {
-
-    boolean antExists = antAtTile != null;
-
-    antSprite.setVisible(antExists);
-
-    if (antExists) {
-      // Change ant sprite based on ant state
-      // Change angle of ant sprite based on the direction it traversed
+  public void setTerrainSprite(TileType type) {
+    // Technically only used to update food terrain after an ant has picked up food
+    if (type != this.type) {
+      terrainSprite.setImage(new Image(String.format("%s.png", type.toString().toLowerCase())));
+      this.type = type;
     }
+  }
 
+  public void setAntSprite(Ant ant) {
+    // Display an ant on the tile if there should be one, and set the ant's colour based on its state
+    boolean containsAnt = ant != null;
+    antSprite.setVisible(containsAnt);
+
+    if (containsAnt) {
+      antSprite.setImage(new Image(String.format("%s.png", ant.state.toString().toLowerCase())));
+      antSprite.setRotate(ant.rotationAngle);
+    }
+  }
+
+  public void setSize(double size) {
     for (ImageView image : List.of(terrainSprite, antSprite)) {
       image.setFitWidth(size);
       image.setFitHeight(size);

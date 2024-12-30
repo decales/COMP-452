@@ -15,20 +15,26 @@ public class EnvironmentGrid extends GridPane implements PublishSubscribe {
     int gridDimension = environmentGrid.length;
     for (int i = 0; i < gridDimension; i++) {
       for (int j = 0; j < gridDimension; j++) {
-        add(new EnvironmentTile(environmentGrid[i][j], new GridPosition(i, j)), i, j);
+        add(new EnvironmentTile(environmentGrid[i][j], new GridPosition(j, i)), i, j);
       }
     }
   }
 
-  public void update(double size, TileType[][] environmentGrid, HashMap<GridPosition, Ant> antPositionMap) {
-
+  public void update(double windowSize, TileType[][] environmentGrid, HashMap<GridPosition, Ant> antPositionMap) {
+    // Create GridPane children nodes once
     if (getChildren().isEmpty()) initGrid(environmentGrid);
 
+    double tileGap = windowSize *0.0005;
+    setHgap(tileGap);
+    setVgap(tileGap);
+
+    // Update the GridPane children
     for (Node node : getChildren()) {
       EnvironmentTile tile = (EnvironmentTile) node;
 
-      Ant antAtTile = antPositionMap.get(new GridPosition(tile.position.y, tile.position.x)); // Can be null if no ant exists
-      tile.updateTile(antAtTile, size / environmentGrid.length);
+      tile.setTerrainSprite(environmentGrid[tile.position.y][tile.position.x]);
+      tile.setAntSprite(antPositionMap.get(new GridPosition(tile.position.y, tile.position.x)));
+      tile.setSize(windowSize / environmentGrid.length);
     }
   }
 }

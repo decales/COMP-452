@@ -17,23 +17,21 @@ public class App extends Application {
     double width = Screen.getPrimary().getBounds().getWidth() * scale;
     double height = Screen.getPrimary().getBounds().getHeight() * scale;
 
-    Model model = new Model(width, height, 32, 4);
+    
+    int gridDimension = 32; // Create gridDimension * gridDimension grid
+    int numAnts = 4;
+    Model model = new Model(height, gridDimension, numAnts);
     
     StackPane root = new StackPane();
-    root.setPrefSize(width, height);
-
     EnvironmentGrid grid = new EnvironmentGrid();
 
     root.getChildren().addAll(grid);
-
     model.addSubscribers(grid);
-
     model.animate();
 
-    Scene scene = new Scene(root, width, height);
+    Scene scene = new Scene(root);
     stage.setTitle("");
     stage.setScene(scene);
-    stage.setResizable(false);
     stage.show();
   }
 
