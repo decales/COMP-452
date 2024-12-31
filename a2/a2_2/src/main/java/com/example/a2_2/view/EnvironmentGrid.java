@@ -13,7 +13,7 @@ public class EnvironmentGrid extends GridPane implements PublishSubscribe {
   private void initGrid(TileType[][] environmentGrid, double borderSize) {
 
     getChildren().clear();
-    setStyle("-fx-background-color: #2e4c2e; -fx-border-color: darkslategrey; -fx-border-width: " + borderSize);
+    setStyle("-fx-background-color: #294f29; -fx-border-color: darkslategrey; -fx-border-width: " + borderSize);
 
     int gridDimension = environmentGrid.length;
     for (int i = 0; i < gridDimension; i++) {
@@ -23,7 +23,7 @@ public class EnvironmentGrid extends GridPane implements PublishSubscribe {
     }
   }
 
-  public void update(double windowSize, TileType[][] environmentGrid, HashMap<GridPosition, Ant> antPositionMap) {
+  public void update(double windowSize, boolean simulationStarted, TileType[][] environmentGrid, HashMap<GridPosition, Ant> antPositionMap) {
 
     double tileSize = windowSize / environmentGrid.length;
     double tileGap = tileSize *0.1;
