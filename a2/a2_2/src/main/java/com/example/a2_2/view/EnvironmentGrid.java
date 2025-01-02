@@ -12,9 +12,10 @@ public class EnvironmentGrid extends GridPane implements PublishSubscribe {
 
   private void initGrid(TileType[][] environmentGrid, double borderSize) {
 
-    getChildren().clear();
+    getChildren().clear(); // Clear children in case function is recalled on re-initialized on grid dimension change
     setStyle("-fx-background-color: #294f29; -fx-border-color: darkslategrey; -fx-border-width: " + borderSize);
 
+    // Create and add nodes to GridPane to have visual grid of environmenGrid
     int gridDimension = environmentGrid.length;
     for (int i = 0; i < gridDimension; i++) {
       for (int j = 0; j < gridDimension; j++) {
@@ -23,14 +24,20 @@ public class EnvironmentGrid extends GridPane implements PublishSubscribe {
     }
   }
 
-  public void update(double windowSize, boolean simulationStarted, TileType[][] environmentGrid, HashMap<GridPosition, Ant> antPositionMap) {
+  public void update(
+      double windowSize,
+      boolean simulationStarted,
+      boolean animationPlaying,
+      TileType[][] environmentGrid,
+      HashMap<GridPosition, Ant> antPositionMap,
+      int numberAnts) {
 
     double tileSize = windowSize / environmentGrid.length;
-    double tileGap = tileSize *0.1;
+    double tileGap = tileSize * 0.1;
     setHgap(tileGap);
     setVgap(tileGap);
     
-    // Initialize GridPane children only when the grid dimenions change
+    // Initialize GridPane children only when the grid dimensions change
     if (Math.pow(environmentGrid.length, 2) != getChildren().size()) initGrid(environmentGrid, tileGap);
 
     // Update the GridPane children

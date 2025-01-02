@@ -18,10 +18,10 @@ public class Model {
   private Random random;
   private double windowSize;
   private Timeline animationTimer;
+  private boolean animationPlaying;
   private boolean simulationStarted;
 
   private TileType[][] environmentGrid;
-  private int gridDimension;
   private int numberAnts;
   private HashMap<GridPosition, Ant> antPositionMap;
   private ArrayList<GridPosition> homePositions;
@@ -36,51 +36,61 @@ public class Model {
     animationTimer = new Timeline(new KeyFrame(Duration.seconds(1), event -> moveAnts()));
     animationTimer.setCycleCount(Animation.INDEFINITE);
 
-    // Default grid and ant values
-    gridDimension = 16;
-    numberAnts = 0;
-
     antPositionMap = new HashMap<>(); // Maps a GridPosition in the environmentGrid to an Ant object, container for Ants
     homePositions = new ArrayList<>(); // Keep track of home tiles in environment grid separately for ant home pathing purposes
-    generate();
+
+    initializeGrid(16);
   }
 
   public void startSimulation() {
     simulationStarted = true;
-    generate();
-    startAnimation();
+    generate(); // Generate tiles and ants
+    playAnimation();
+    updateSubscribers();
+  }
+
+  public void resetSimulation() {
+    simulationStarted = false;
+    pauseAnimation();
+    
+    // Reset structures related to environment
+    initializeGrid(environmentGrid.length);
+    antPositionMap.clear();
+    homePositions.clear();
+    
+    updateSubscribers();
+  }
+
+  public void playAnimation() {
+    animationPlaying = true;
+    animationTimer.play();
+    updateSubscribers();
+  }
+
+  public void pauseAnimation() {
+    animationPlaying = false;
+    animationTimer.pause();
+    updateSubscribers();
   }
 
   public void setNumberAnts(int numberAnts) {
     this.numberAnts = numberAnts;
+    updateSubscribers();
   }
 
-  public void setGridDimension(int gridDimension) {
-    this.gridDimension = gridDimension;
-  }
-
-  public void startAnimation() {
-    if (simulationStarted) animationTimer.play();
-  }
-
-  private void pauseAnimation() {
-    if (simulationStarted) animationTimer.pause();
+  public void initializeGrid(int gridDimension) {
+    // Initialize grid and set all tiles to default terrain
+    environmentGrid = new TileType[gridDimension][gridDimension];
+    for (int i = 0; i < environmentGrid.length; i++) Arrays.fill(environmentGrid[i], TileType.Default);
+    updateSubscribers();
   }
 
   private void generate() {
-    double totalTiles = Math.pow(gridDimension, 2);
+    double totalTiles = Math.pow(environmentGrid.length, 2);
 
     // Only generate environment if less than 33.3% of the grid would be filled with Ants
-    if (antPositionMap.size() + numberAnts < totalTiles * 0.333) { // 8:21, 16:85, 32:341
+    if (antPositionMap.size() + numberAnts < totalTiles * 0.333) { // 8:21, 16:85, 32:340
 
-      // Initialize grid and set all tiles to default terrain
-      environmentGrid = new TileType[gridDimension][gridDimension];
-      for (int i = 0; i < gridDimension; i++) Arrays.fill(environmentGrid[i], TileType.Default);
-      
-      // Reset other structures related to environment
-      antPositionMap.clear();
-      homePositions.clear();
-      
       // Generate the rest of the tile types at varying ratios
       generateTileType(TileType.Home, (int) Math.ceil(totalTiles * 0.005)); // 0.5% of grid
       generateTileType(TileType.Water, (int) Math.ceil(totalTiles * 0.025)); // 2.5% of grid
@@ -95,7 +105,7 @@ public class Model {
 
   private void generateTileType(TileType tileType, int numTiles) {
     while (numTiles > 0) {
-      GridPosition tilePosition = new GridPosition(random.nextInt(gridDimension), random.nextInt(gridDimension));
+      GridPosition tilePosition = new GridPosition(random.nextInt(environmentGrid.length), random.nextInt(environmentGrid.length));
 
       if (environmentGrid[tilePosition.y][tilePosition.x] == TileType.Default) { // Only replace default terrain
         environmentGrid[tilePosition.y][tilePosition.x] = tileType;
@@ -107,9 +117,9 @@ public class Model {
 
   private void generateAnts(int numberAnts) {
     // Redundant check needed based on how this function is used to spawn a new ant when another ant brings food home
-    if (antPositionMap.size() + numberAnts < Math.pow(gridDimension, 2) * 0.333) {
+    if (antPositionMap.size() + numberAnts < Math.pow(environmentGrid.length, 2) * 0.333) {
       while (numberAnts > 0) {
-        GridPosition startPosition = new GridPosition(random.nextInt(gridDimension), random.nextInt(gridDimension));
+        GridPosition startPosition = new GridPosition(random.nextInt(environmentGrid.length), random.nextInt(environmentGrid.length));
 
         // Only place an ant on default terrain that does not already contain another ant;
         if (environmentGrid[startPosition.y][startPosition.x] == TileType.Default && !antPositionMap.containsKey(startPosition)) {
@@ -187,8 +197,8 @@ public class Model {
     GridPosition nextPosition = ant.getNextPosition(homePositions);
 
     // Check if an ant's next move is valid
-    if (nextPosition.y >= 0 && nextPosition.y < gridDimension && // Move is within grid boundaries
-        nextPosition.x >= 0 && nextPosition.x < gridDimension &&
+    if (nextPosition.y >= 0 && nextPosition.y < environmentGrid.length && // Move is within grid boundaries
+        nextPosition.x >= 0 && nextPosition.x < environmentGrid.length &&
         !antPositionMap.containsKey(nextPosition) // Move is not to a tile that already contains an ant
     ) {
       // If the move is valid, update the antPosition map to reflect the ant's new position
@@ -210,7 +220,7 @@ public class Model {
 
   public void updateSubscribers() {
     for (PublishSubscribe subscriber : subscribers) {
-      subscriber.update(windowSize, simulationStarted, environmentGrid, antPositionMap);
+      subscriber.update(windowSize, simulationStarted, animationPlaying, environmentGrid, antPositionMap, numberAnts);
     }
   }
 }
