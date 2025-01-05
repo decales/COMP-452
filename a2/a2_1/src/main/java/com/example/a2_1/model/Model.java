@@ -134,7 +134,13 @@ public class Model {
     nextVisit.add(new AStarNode(character_i, character_j, 0, null)); // fCost doesn't matter
 
     while(!nextVisit.isEmpty()) {
+      
+      for (AStarNode n : nextVisit) System.out.print(String.format("(%d,%d):%d  ", n.i, n.j, n.fCost));
+      System.out.println();
       AStarNode currentNode = nextVisit.poll(); //  retrieve next best node
+      System.out.println(String.format(" Best: (%d,%d):%d", currentNode.i, currentNode.j, currentNode.fCost));
+      System.out.println();
+      
       visitOrder.add(currentNode);
       visited[currentNode.i][currentNode.j] = 1;
 
